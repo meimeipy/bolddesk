@@ -257,7 +257,7 @@ def acharcliente(dados):
         # Lógica de paginação
         while True:
             # Consulta para obter os contatos
-            response_contatos = requests.get(url_contatos, headers=headers, params=params_contatos)
+            response_contatos = requests.get(url_contatos, headers=headers, params=params)
             response_contatos.raise_for_status()  # Verifica se houve erro na requisição
             if params["Page"] >=12:
                     break
