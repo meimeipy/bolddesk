@@ -259,8 +259,6 @@ def acharcliente(dados):
             # Consulta para obter os contatos
             response_contatos = requests.get(url_contatos, headers=headers, params=params)
             response_contatos.raise_for_status()  # Verifica se houve erro na requisição
-            if params["Page"] >=12:
-                    break
             dados_bold_desk = response_contatos.json().get("result", [])
 
             # Processa os dados
@@ -273,11 +271,11 @@ def acharcliente(dados):
                         return f"Contact encontrado para contactExternalReferenceId {dados['cnpj_cpf']}, mas 'userId' não está presente."
 
             # Verifica se há mais páginas
-        
-                params["Page"] += 1
-            else:
+            if params["Page"] >= 12:
                 # Não há mais páginas, encerra o loop
                 break
+
+            params["Page"] += 1
 
     except requests.exceptions.RequestException as e:
         return f"Falha na solicitação: {str(e)}"
