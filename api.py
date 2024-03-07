@@ -239,60 +239,75 @@ def webhook_delete():
         return jsonify({"message": "ClienteFornecedor.Alterado não encontrado no JSON"})
 
 #########################################################################################################
-def acharcliente(dados):
-    url_tickets = "https://vittel.bolddesk.com/api/v1.0/tickets"
-    url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
-    
-    headers = {"x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="}
-    
-    params_tickets = {}
-    params = {"PerPage": 10, "Page": 1}
 
-    try:
-        # Consulta inicial para obter os tickets
-        response_tickets = requests.get(url_tickets, headers=headers, params=params_tickets)
-        response_tickets.raise_for_status()  # Verifica se houve erro na requisição
-        print("Tickets:", response_tickets.json())
-        
-        # Lógica de paginação
-        while True:
-            # Consulta para obter os contatos
-            response_contatos = requests.get(url_contatos, headers=headers, params=params)
-            response_contatos.raise_for_status()  # Verifica se houve erro na requisição
-            dados_bold_desk = response_contatos.json().get("result", [])
+def formatt_cnpj_cpf(value):
+    return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
-            # Processa os dados
-            for contact in dados_bold_desk:
-                if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == dados['cnpj_cpf']:
-                    if 'userId' in contact:
-                        user_id = contact['userId']
-                        return f"UserID encontrado para contactExternalReferenceId {dados['cnpj_cpf']}: USERID {user_id}"
-                    else:
-                        return f"Contact encontrado para contactExternalReferenceId {dados['cnpj_cpf']}, mas 'userId' não está presente."
+def acharocliente(dadoss):
+    url = "https://vittel.bolddesk.com/api/v1.0/tickets"
+    headers = {
+        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+    }
 
-            # Verifica se há mais páginas
-            if params["Page"] >= 12:
-                # Não há mais páginas, encerra o loop
-                break
+    response_tickets = requests.get(url, headers=headers)
+    print("1", response_tickets)
 
-            params["Page"] += 1
+    if response_tickets.status_code == 200:
+        url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
+        params = {
+            "PerPage": 40,
+            "Page": 1,
+        }
+        try:
+            while True:
+                response_contatos = requests.get(url_contatos, headers=headers, params=params)
+                print("2", response_contatos.text)
+                response_contatos.raise_for_status()
+                if params["Page"] >= 21:
+                    break
+                if response_contatos.status_code == 200:
+                    dados_bold_desk = response_contatos.json().get("result", [])
+                    print("3", dados_bold_desk)
 
-    except requests.exceptions.RequestException as e:
-        return f"Falha na solicitação: {str(e)}"
+                    for contact in dados_bold_desk:
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dadoss['cnpj_cpf']):
+                            if 'userId' in contact:
+                                user_id = contact['userId']
+                                print("123333", user_id)
+                                return "true"
+                            else:
+                                return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
-    return f"Nenhum contato encontrado para contactExternalReferenceId {dados['cnpj_cpf']}"
+                    params["Page"] += 1
+                else:
+                    break
+
+            return f"Nenhum contato encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}"
+
+        except requests.exceptions.RequestException as e:
+            return f"Falha na solicitação: {str(e)}"
+
+    return f"Falha ao obter tickets: {response_tickets.status_code}"
 
 @app.route('/webhook/consultaclienteid', methods=['GET']) 
-def dados_bot():
-    dados = request.args
-    print("Dados recebidos:", dados)
-
-    if 'cnpj_cpf' in dados and dados['cnpj_cpf']:
-        return acharcliente(dados)
+def dados_rece():
+    dadoss = request.args  
+    
+    if 'cnpj_cpf' in dadoss and dadoss['cnpj_cpf']:
+        return acharocliente(dadoss)
     else:
         return jsonify({"message": "Os parâmetros são necessários"}), 400
     
-########################################################
+    
+    
+    
+    
+
+###############################################################################################
+
+
+
+
 def acharcliente(dados):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
@@ -509,6 +524,9 @@ def handle_delete_ticket_request():
     else:
         return jsonify({"message": "Os parâmetros são necessários"}), 400
     
+def format_cnpj_cpf(value):
+    return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
+
 def encontrarcliente(dados):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
@@ -521,7 +539,7 @@ def encontrarcliente(dados):
     if response_tickets.status_code == 200:
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         params = {
-            "PerPage": 10,
+            "PerPage": 40,
             "Page": 1,
         }
         try:
@@ -529,14 +547,14 @@ def encontrarcliente(dados):
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
                 print("2", response_contatos.text)
                 response_contatos.raise_for_status()
-                if params["Page"] >=12:
+                if params["Page"] >=21:
                     break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
                     print("3", dados_bold_desk)
 
                     for contact in dados_bold_desk:
-                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == dados['cnpj_cpf']:
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == format_cnpj_cpf(dados['cnpj_cpf']):
                             if 'userId' in contact:
                                 user_id = contact['userId']
                                 print("123333", user_id)
