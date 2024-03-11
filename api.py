@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
+from datetime import datetime
 import requests
+import jsonpickle
 app = Flask(__name__)
 def adicionar_contato_bold_desk(cliente_fornecedor_detalhes):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
@@ -239,7 +241,7 @@ def webhook_delete():
         return jsonify({"message": "ClienteFornecedor.Alterado não encontrado no JSON"})
 
 #########################################################################################################
-
+# consulta cnpj
 def formatt_cnpj_cpf(value):
     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
@@ -306,9 +308,12 @@ def dados_rece():
 ###############################################################################################
 
 
+# consulta detalhes do ticket
 
+def formatt_cnpj_cpf(value):
+    return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
-def acharcliente(dados):
+def acharocliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
         "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
@@ -316,51 +321,41 @@ def acharcliente(dados):
 
     response_tickets = requests.get(url, headers=headers)
     print("1", response_tickets)
-    
+
     if response_tickets.status_code == 200:
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         params = {
             "PerPage": 40,
             "Page": 1,
         }
-    try:
-
-        while True:
-                # Consulta para obter os contatos
-            response_contatos = requests.get(url_contatos, headers=headers, params=params)
-            response_contatos.raise_for_status()  # Verifica se houve erro na requisição
-            if params["Page"] >=12:
+        try:
+            while True:
+                response_contatos = requests.get(url_contatos, headers=headers, params=params)
+                print("2", response_contatos.text)
+                response_contatos.raise_for_status()
+                if params["Page"] >= 21:
                     break
-            print("2", response_contatos.text)
-            
-            if response_contatos.status_code == 200:
-                dados_bold_desk = response_contatos.json().get("result", [])
-                print("3", dados_bold_desk)
+                if response_contatos.status_code == 200:
+                    dados_bold_desk = response_contatos.json().get("result", [])
+                    print("3", dados_bold_desk)
 
-                for contact in dados_bold_desk:
-                    if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == dados['cnpj_cpf']:
-                        if 'userId' in contact:
-                            user_id = contact['userId']
-                            print(user_id)
-                            return consultar_detalhes_do_ticket(user_id)
-                        
-                            return f"UserID encontrado para contactExternalReferenceId {dados['cnpj_cpf']}: USERID {user_id}"
-                        else:
-                            return f"Contact encontrado para contactExternalReferenceId {dados['cnpj_cpf']}, mas 'userId' não está presente."
+                    for contact in dados_bold_desk:
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dadoss['cnpj_cpf']):
+                            if 'userId' in contact:
+                                user_id = contact['userId']
+                                print("123333", user_id)
+                                return consultar_detalhes_do_ticket(user_id)
+                            else:
+                                return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
-                
                     params["Page"] += 1
                 else:
-                    
                     break
 
-    except requests.exceptions.RequestException as e:
-        return f"Falha na solicitação: {str(e)}"
+            return f"Nenhum contato encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}"
 
-    return f"Nenhum contato encontrado para contactExternalReferenceId {dados['cnpj_cpf']}"
-
-    
-    return "Falha na busca do cliente"
+        except requests.exceptions.RequestException as e:
+            return f"Falha na solicitação: {str(e)}"
 def consultar_detalhes_do_ticket(user_id):
     url_ticket = f"https://vittel.bolddesk.com/api/v1/tickets"
     headers = {
@@ -383,65 +378,131 @@ def consultar_detalhes_do_ticket(user_id):
     
 @app.route('/webhook/consultat', methods=['GET']) 
 def dados_boot():
-    dados = request.args  
-    print("12", dados)
+    dadoss = request.args  
+    print("12", dadoss)
     
-    if 'cnpj_cpf' in dados and dados['cnpj_cpf']:
-        return acharcliente(dados)
+    if 'cnpj_cpf' in dadoss and dadoss['cnpj_cpf']:
+        return acharocliente(dadoss)
     else:
         return jsonify({"message": "Os parâmetros são necessários"}), 400
     
 ################################################################################################    
-    
+    # ABRIR TICKET
+def formatt_cnpj_cpf(value):
+    return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
-def Abrir_Ticket():
+def acharoccliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
         "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
     }
 
-    response = requests.get(url, headers=headers)
-    print("1", response)
+    response_tickets = requests.get(url, headers=headers)
     
-    base_url = "https://vittel.bolddesk.com/api/v1/tickets"
 
+    if response_tickets.status_code == 200:
+        url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
+        params = {
+            "PerPage": 40,
+            "Page": 1,
+        }
+        try:
+            while True:
+                response_contatos = requests.get(url_contatos, headers=headers, params=params)
+                
+                response_contatos.raise_for_status()
+                if params["Page"] >= 21:
+                    break
+                if response_contatos.status_code == 200:
+                    dados_bold_desk = response_contatos.json().get("result", [])
+                    
+
+                    for contact in dados_bold_desk:
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dadoss['cnpj_cpf']):
+                            if 'userId' in contact:
+                                user_id = contact['userId']
+                                print(user_id)
+                                return Abrir_Ticket(user_id, dadoss)
+                            else:
+                                return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
+
+                    params["Page"] += 1
+                else:
+                    break
+
+            return f"Nenhum contato encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}"
+
+        except requests.exceptions.RequestException as e:
+            return f"Falha na solicitação: {str(e)}"
+
+def Abrir_Ticket(user_id, dadoss):
+        dadoss = dict(dadoss)
+        extracted_data = {key: dadoss.get(key) for key in ["Assunto", "Categoria", "Descrição"]}
+        print(extracted_data)
+        category_ids = {
+            "Telefonia IP": 11,
+            "PABX IP": 12,
+            "Ramais Hardphone": 13,
+            "Ramais Softphone": 14,
+            "Ramais Agentes": 15,
+            "Call Center": 16,
+            "Sip Trunk": 17,
+            "Chat": 18,
+            "Omnichannel": 19,
+            "WhatsApp Web": 20,
+            "WhatsApp API Cloud": 21,
+            "Cloud Server": 22,
+            "SMS": 23
+        }
+        
+        user_selection = dadoss['Categoria']  
+        category_id = category_ids[user_selection]
+        
+        now = datetime.utcnow()
+        dueDate = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     
-    params = {
-        "Page": 1,
-        "PerPage": 10,
-        "RequiresCounts": True,
-        "OrderBy": "ticketId"
-    }
+        
+        ticket_data = {
+            "brandId": 1,
+            "subject": extracted_data['Assunto'],
+            "categoryId": category_id,  
+            "isVisibleInCustomerPortal": True,
+            "requesterId": user_id,  
+            "description": extracted_data['Descrição'],
+            "priorityId": 1,
+            "dueDate": dueDate,
+            "ticketPortalValue": 0
+        }
+        
+        url_ticket = "https://vittel.bolddesk.com/api/v1/tickets"
+        headers = {
+            "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU=",
+        }
+        
+        response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
+        print("1", response_ull.status_code)
+        if response_ull.status_code == 201:
+            
+           print(response_ull.text)
+           
+           return "true", 201
+        else:
+            return "false", 400
 
-    # Cabeçalho da solicitação
-    headers = {
-        "x-api-key": "{yourapikey}"
-    }
-    data= request.json
-    # Realiza a solicitação GET com os parâmetros e cabeçalhos
-    response = requests.get(base_url,json=data, params=params, headers=headers)
-
-    # Verifica se a solicitação foi bem-sucedida (código de status 200)
-    if response.status_code == 200:
-        # Processa os dados da resposta (json(), text(), etc.)
-        tickets_data = response.json()
-        print(tickets_data)
+@app.route('/webhook/opent', methods=['POST']) 
+def dados_booti():
+    dadoss = request.args  
+    print("12", dadoss)
+    
+    if 'cnpj_cpf' in dadoss and dadoss['cnpj_cpf']:
+        return acharoccliente(dadoss)
     else:
-        # Lida com erros ou códigos de status não esperados
-        print(f"Erro na solicitação: {response.status_code} - {response.text}")
-@app.route('/webhook/opent', methods=['POST'])         
-def dados_boott():
-    dados = request.args  
-    print("12", dados)
-    
-    if 'cnpj_cpf' in dados and dados['cnpj_cpf']:
-        return acharcliente(dados)
-    else:
-        return jsonify({"message": "Os parâmetros são necessários"}), 400     
-    
-
+        return jsonify({"message": "Os parâmetros são necessários"}), 400
 #############################################################################################
-def acharcliente(dados):
+def formatt_cnpj_cpf(value):
+    return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
+
+def acharocliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
         "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
@@ -449,49 +510,41 @@ def acharcliente(dados):
 
     response_tickets = requests.get(url, headers=headers)
     print("1", response_tickets)
-    
+
     if response_tickets.status_code == 200:
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         params = {
-            "PerPage": 10,
+            "PerPage": 40,
             "Page": 1,
         }
-    try:
-
-        while True:
-                
-            response_contatos = requests.get(url_contatos, headers=headers, params=params)
-            response_contatos.raise_for_status()  
-            if params["Page"] >=12:
+        try:
+            while True:
+                response_contatos = requests.get(url_contatos, headers=headers, params=params)
+                print("2", response_contatos.text)
+                response_contatos.raise_for_status()
+                if params["Page"] >= 21:
                     break
-            print("2", response_contatos.text)
-            
-            if response_contatos.status_code == 200:
-                dados_bold_desk = response_contatos.json().get("result", [])
-                print("3", dados_bold_desk)
+                if response_contatos.status_code == 200:
+                    dados_bold_desk = response_contatos.json().get("result", [])
+                    print("3", dados_bold_desk)
 
-                for contact in dados_bold_desk:
-                    if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == dados['cnpj_cpf']:
-                        if 'userId' in contact:
-                            user_id = contact['userId']
-                            print(user_id)
-                            return consultar_detalhes_do_ticket(user_id)
-                        
-                            return f"UserID encontrado para contactExternalReferenceId {dados['cnpj_cpf']}: USERID {user_id}"
-                        else:
-                            return f"Contact encontrado para contactExternalReferenceId {dados['cnpj_cpf']}, mas 'userId' não está presente."
+                    for contact in dados_bold_desk:
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dadoss['cnpj_cpf']):
+                            if 'userId' in contact:
+                                user_id = contact['userId']
+                                print("123333", user_id)
+                                return consultar_detalhes_do_ticket(user_id)
+                            else:
+                                return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
-                
                     params["Page"] += 1
                 else:
-                    
                     break
 
-    except requests.exceptions.RequestException as e:
-        return f"Falha na solicitação: {str(e)}"
+            return f"Nenhum contato encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}"
 
-    return f"Nenhum contato encontrado para contactExternalReferenceId {dados['cnpj_cpf']}"
-
+        except requests.exceptions.RequestException as e:
+            return f"Falha na solicitação: {str(e)}"
     
     return "Falha na busca do cliente"
 def consultar_detalhes_do_ticket(user_id):
@@ -516,14 +569,17 @@ def consultar_detalhes_do_ticket(user_id):
     
 @app.route('/webhook/deletarticket', methods=['DEL']) 
 def handle_delete_ticket_request():
-    dados = request.args  
-    print("12", dados)
+    dadoss = request.args  
+    print("12", dadoss)
     
-    if 'cnpj_cpf' in dados and dados['cnpj_cpf']:
-        return acharcliente(dados)
+    if 'cnpj_cpf' in dadoss and dadoss['cnpj_cpf']:
+        return acharocliente(dadoss)
     else:
         return jsonify({"message": "Os parâmetros são necessários"}), 400
     
+    
+    
+#  achar agente   
 def format_cnpj_cpf(value):
     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
