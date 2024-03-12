@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from datetime import datetime
 import requests
-import jsonpickle
 app = Flask(__name__)
 def adicionar_contato_bold_desk(cliente_fornecedor_detalhes):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
