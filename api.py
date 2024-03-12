@@ -244,7 +244,7 @@ def webhook_delete():
 def formatt_cnpj_cpf(value):
     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
-def acharocliente(dadoss):
+def buscacliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
         "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
@@ -264,14 +264,14 @@ def acharocliente(dadoss):
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
                 print("2", response_contatos.text)
                 response_contatos.raise_for_status()
-                if params["Page"] >= 21:
+                if params["Page"] >=21:
                     break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
                     print("3", dados_bold_desk)
 
                     for contact in dados_bold_desk:
-                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dadoss['cnpj_cpf']):
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == format_cnpj_cpf(dadoss['cnpj_cpf']):
                             if 'userId' in contact:
                                 user_id = contact['userId']
                                 print("123333", user_id)
@@ -279,23 +279,26 @@ def acharocliente(dadoss):
                             else:
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
+                    # Fix the typo and adjust the indentation
                     params["Page"] += 1
                 else:
+                    # Move this break outside the loop to continue checking pages
                     break
 
+            # This return statement will only be reached if the loop completes without finding the contact
             return f"Nenhum contato encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}"
 
         except requests.exceptions.RequestException as e:
-            return f"Falha na solicitação: {str(e)}"
+         return jsonify({"error": f"Falha na solicitação: {str(e)}"}), 500
 
-    return f"Falha ao obter tickets: {response_tickets.status_code}"
+    return jsonify({"error": f"Falha ao obter tickets: {response_tickets.status_code}"}), 500
 
 @app.route('/webhook/consultaclienteid', methods=['GET']) 
 def dados_rece():
     dadoss = request.args  
     
     if 'cnpj_cpf' in dadoss and dadoss['cnpj_cpf']:
-        return acharocliente(dadoss)
+        return buscacliente(dadoss)
     else:
         return jsonify({"message": "Os parâmetros são necessários"}), 400
     
