@@ -648,13 +648,44 @@ def agenteachado(user_id):
         results = response.json().get("result", [])
 
         if results:
-            # Assuming the first item in the list contains the agent information
-            agent_info = results[0].get("agent", {})
-            
-            if agent_info:
-                agent_name = agent_info.get("name")
-                return f"Nome do agente: {agent_name}"
-            else:
+            # Assuming the first item in the list contains the ticket information
+            ticket_info = results[0]
+
+            # Extracting the required fields
+            agente = ticket_info.get("agent", {})
+            marca = ticket_info.get("brand")
+            categoria = ticket_info.get("category", {})
+            criadoEm = ticket_info.get("createdOn")
+            ultimaRespostaEm = ticket_info.get("lastRepliedOn")
+            ultimaMudancaStatusEm = ticket_info.get("lastStatusChangedOn")
+            prioridade = ticket_info.get("priority", {})
+            solicitante = ticket_info.get("requester", {})
+            resolucaoPrevistaPara = ticket_info.get("resolutionDue")
+            respostaPrevistaPara = ticket_info.get("responseDue")
+            origem = ticket_info.get("source")
+            status = ticket_info.get("status", {})
+            tag = ticket_info.get("tag", [])
+            titulo = ticket_info.get("title")
+
+            # You can now use these variables in your code
+            # For example, you can return them as a dictionary:
+            return {
+                "agente": agente,
+                "marca": marca,
+                "categoria": categoria,
+                "criadoEm": criadoEm,
+                "ultimaRespostaEm": ultimaRespostaEm,
+                "ultimaMudancaStatusEm": ultimaMudancaStatusEm,
+                "prioridade": prioridade,
+                "solicitante": solicitante,
+                "resolucaoPrevistaPara": resolucaoPrevistaPara,
+                "respostaPrevistaPara": respostaPrevistaPara,
+                "origem": origem,
+                "status": status,
+                "tag": tag,
+                "titulo": titulo
+            }
+        else:
                 return "Informações do agente não encontradas na resposta."
 
         return "Nenhum resultado encontrado na resposta."
