@@ -692,7 +692,7 @@ def agenteachado(user_id):
 
     return f"Falha ao consultar detalhes do ticket para UserID"
 
-@app.route('/webhook/agente', methods=['GET']) 
+@app.route('/webhook/detalhesticket', methods=['GET']) 
 def dados_recebidos2():
     dados = request.args  
     print("12", dados)
