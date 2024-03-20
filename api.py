@@ -487,7 +487,7 @@ def Abrir_Ticket(user_id, dadoss):
             
            print(response_ull.text)
            
-           return "true", 201, response_ull.json()
+           return "true", 201, response_ull.text()
         else:
             return "false", 400
 
