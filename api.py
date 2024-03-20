@@ -440,7 +440,7 @@ def acharoccliente(dadoss):
 def Abrir_Ticket(user_id, dadoss):
         dadoss = dict(dadoss)
         extracted_data = {key: dadoss.get(key) for key in ["Assunto", "Categoria", "Descrição"]}
-        print(extracted_data)
+        print("123", extracted_data)
         category_ids = {
             "Telefonia IP": 11,
             "PABX IP": 12,
@@ -487,7 +487,7 @@ def Abrir_Ticket(user_id, dadoss):
             
            print(response_ull.text)
            
-           return "true", 201, response_ull.text
+           return "true", 201
         else:
             return "false", 400
 
