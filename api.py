@@ -556,26 +556,28 @@ def consultar_detalhes_do_ticket(user_id):
     }
    
     params = {
-        "Q":  [f"requester:[{user_id}]"],
-        }
+    "Q":  [f"requester:[{user_id}]", "ticketId:[0]", "status:[1,2]"], 
+    }
 
-    all_tickets = []
-    page = 1
-    while True:
-        params['Page'] = page
-        response_ticket = requests.get(url_ticket, headers=headers, params=params)
-        print(response_ticket)
-        
-        if response_ticket.status_code == 200:
-            tickets = response_ticket.json().get('data', [])
-            if not tickets:
-                break
-            all_tickets.extend(tickets)
-            page += 1
-        else:
-            return f"Falha ao consultar detalhes do ticket para UserID {user_id}"
 
-    return all_tickets
+    response_ticket = requests.get(url_ticket, headers=headers, params=params)
+    print(response_ticket)
+    
+    if response_ticket.status_code == 200:
+        return response_ticket
+    else:
+        return f"Falha ao consultar detalhes do ticket para UserID {user_id}"
+
+    
+@app.route('/webhook/deletarticket', methods=['DEL']) 
+def handle_delete_ticket_request():
+    dadoss = request.args  
+    print("12", dadoss)
+    
+    if 'cnpj_cpf' in dadoss and dadoss['cnpj_cpf']:
+        return acharocliente(dadoss)
+    else:
+        return jsonify({"message": "Os parâmetros são necessários"}), 400
     
     
     
