@@ -458,7 +458,7 @@ def Abrir_Ticket(user_id, dadoss):
         }
         
         user_selection = dadoss.get('Categoria')
-        category_id = category_ids(user_selection)
+        category_id = category_ids[user_selection]
         
         now = datetime.utcnow()
         dueDate = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
