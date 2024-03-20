@@ -689,7 +689,7 @@ def agenteachado(user_id):
                 "titulo": titulo
             }
         else:
-                return "Informações do agente não encontradas na resposta."
+                return "Não existe tickets."
 
         return "Nenhum resultado encontrado na resposta."
 
