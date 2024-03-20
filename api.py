@@ -556,7 +556,7 @@ def consultar_detalhes_do_ticket(user_id):
     }
    
     params = {
-        "Q":  [f"requester:[{user_id}]"
+        "Q":  [f"requester:[{user_id}]"]}
 
     all_tickets = []
     page = 1
