@@ -556,7 +556,7 @@ def consultar_detalhes_do_ticket(user_id):
     }
    
     params = {
-    "Q":  [f"requester:[{user_id}]", "ticketId:[1]", "status:[1,2]"], 
+    "Q":  [f"requester:[{user_id}]", "status:[1,2]"], 
     }
 
 
