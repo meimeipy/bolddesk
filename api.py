@@ -556,7 +556,7 @@ def consultar_detalhes_do_ticket(user_id):
     }
    
     params = {
-    "Q":  [f"requester:[{user_id}]", "ticketId:[0]", "status:[1,2]"], 
+    "Q":  [f"requester:[{user_id}]", "ticketId:[1]", "status:[1,2]"], 
     }
 
 
@@ -650,10 +650,8 @@ def agenteachado(user_id):
         # Assuming the response is a JSON object with a 'result' field containing a list
         results = response.json().get("result", [])
 
-        if results:
-            # Assuming the first item in the list contains the ticket information
-            ticket_info = results[0]
-
+        all_tickets = []
+        for ticket_info in results:
             # Extracting the required fields
             agente = ticket_info.get("agent", {})
             marca = ticket_info.get("brand")
@@ -670,9 +668,8 @@ def agenteachado(user_id):
             tag = ticket_info.get("tag", [])
             titulo = ticket_info.get("title")
 
-            # You can now use these variables in your code
-            # For example, you can return them as a dictionary:
-            return {
+            # Add the ticket to the list
+            all_tickets.append({
                 "agente": agente,
                 "marca": marca,
                 "categoria": categoria,
@@ -687,11 +684,12 @@ def agenteachado(user_id):
                 "status": status,
                 "tag": tag,
                 "titulo": titulo
-            }
-        else:
-                return "Não existe tickets."
+            })
 
-        return "Nenhum resultado encontrado na resposta."
+        if all_tickets:
+            return all_tickets
+        else:
+            return "Não existe tickets."
 
     return f"Falha ao consultar detalhes do ticket para UserID"
 
