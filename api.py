@@ -687,7 +687,7 @@ def agenteachado(user_id):
             })
 
         if all_tickets:
-            return all_tickets
+            return jsonify(all_tickets)
         else:
             return "Não existe tickets."
 
