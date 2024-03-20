@@ -457,8 +457,8 @@ def Abrir_Ticket(user_id, dadoss):
             "SMS": 23
         }
         
-        user_selection = dadoss['Categoria']  
-        category_id = category_ids[user_selection]
+        user_selection = dadoss.get('Categoria')
+        category_id = category_ids(user_selection)
         
         now = datetime.utcnow()
         dueDate = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
