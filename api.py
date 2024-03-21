@@ -658,23 +658,30 @@ def agenteachado(dados, user_id):
         # Assuming the response is a JSON object with a 'result' field containing a list
         results = response.json().get("result", [])
         category_ids = {
-        "Telefonia IP": 11,
-        "PABX IP": 12,
-        "Ramais Hardphone": 13,
-        "Ramais Softphone": 14,
-        "Ramais Agentes": 15,
-        "Call Center": 16,
-        "Sip Trunk": 17,
-        "Chat": 18,
-        "Omnichannel": 19,
-        "WhatsApp Web": 20,
-        "WhatsApp API Cloud": 21,
-        "Cloud Server": 22,
-        "SMS": 23
-    }
-    
+                "Telefonia IP": 11,
+                "PABX IP": 12,
+                "Ramais Hardphone": 13,
+                "Ramais Softphone": 14,
+                "Ramais Agentes": 15,
+                "Call Center": 16,
+                "Sip Trunk": 17,
+                "Chat": 18,
+                "Omnichannel": 19,
+                "WhatsApp Web": 20,
+                "WhatsApp API Cloud": 21,
+                "Cloud Server": 22,
+                "SMS": 23
+            }
+            
         user_selection = dados.get('Categoria')
+        if user_selection is None:
+            return "Categoria is required."
+
+        if user_selection not in category_ids:
+            return f"Invalid category: {user_selection}. Valid categories are: {', '.join(category_ids.keys())}"
+
         category_id = category_ids[user_selection]
+            
         all_tickets = []
         for ticket_info in results:
             # Extracting the required fields
