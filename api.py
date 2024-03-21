@@ -466,7 +466,8 @@ def Abrir_Ticket(user_id, dadoss):
     dueDate = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     # Generate the protocol
-    protocol = now.strftime("%Y%m%d%H%M%S%f")
+    # Generate the protocol
+    protocol = now.strftime("%Y%m%d%H%M%S")
 
     # Append the protocol to the subject
     subject_with_protocol = f"{extracted_data['Assunto']} - {protocol}"
