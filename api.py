@@ -624,7 +624,7 @@ def encontrarcliente(dados):
                             if 'userId' in contact:
                                 user_id = contact['userId']
                                 print("123333", user_id)
-                                return agenteachado(user_id)
+                                return agenteachado(dados, user_id)
                             else:
                                  return f"Contact encontrado para contactExternalReferenceId {dados['cnpj_cpf']}, mas 'userId' não está presente."
 
@@ -642,7 +642,7 @@ def encontrarcliente(dados):
 
     return f"Falha ao obter tickets: {response_tickets.status_code}"
 
-def agenteachado(user_id): 
+def agenteachado(dados, user_id): 
     url_agente = f"https://vittel.bolddesk.com/api/v1/tickets/"
     params = {
         "Q": [f"requester:[{user_id}]", "status:[1,2]"]
@@ -657,49 +657,67 @@ def agenteachado(user_id):
     if response.status_code == 200:
         # Assuming the response is a JSON object with a 'result' field containing a list
         results = response.json().get("result", [])
-
+        category_ids = {
+        "Telefonia IP": 11,
+        "PABX IP": 12,
+        "Ramais Hardphone": 13,
+        "Ramais Softphone": 14,
+        "Ramais Agentes": 15,
+        "Call Center": 16,
+        "Sip Trunk": 17,
+        "Chat": 18,
+        "Omnichannel": 19,
+        "WhatsApp Web": 20,
+        "WhatsApp API Cloud": 21,
+        "Cloud Server": 22,
+        "SMS": 23
+    }
+    
+        user_selection = dados.get('Categoria')
+        category_id = category_ids[user_selection]
         all_tickets = []
         for ticket_info in results:
             # Extracting the required fields
-            agente = ticket_info.get("agent", {})
-            marca = ticket_info.get("brand")
-            categoria = ticket_info.get("category", {})
-            criadoEm = ticket_info.get("createdOn")
-            ultimaRespostaEm = ticket_info.get("lastRepliedOn")
-            ultimaMudancaStatusEm = ticket_info.get("lastStatusChangedOn")
-            prioridade = ticket_info.get("priority", {})
-            solicitante = ticket_info.get("requester", {})
-            resolucaoPrevistaPara = ticket_info.get("resolutionDue")
-            respostaPrevistaPara = ticket_info.get("responseDue")
-            origem = ticket_info.get("source")
-            status = ticket_info.get("status", {})
-            tag = ticket_info.get("tag", [])
-            titulo = ticket_info.get("title")
+            if ticket_info.get("category", {}).get("id") == category_id:
+                agente = ticket_info.get("agent", {})
+                marca = ticket_info.get("brand")
+                categoria = ticket_info.get("category", {})
+                criadoEm = ticket_info.get("createdOn")
+                ultimaRespostaEm = ticket_info.get("lastRepliedOn")
+                ultimaMudancaStatusEm = ticket_info.get("lastStatusChangedOn")
+                prioridade = ticket_info.get("priority", {})
+                solicitante = ticket_info.get("requester", {})
+                resolucaoPrevistaPara = ticket_info.get("resolutionDue")
+                respostaPrevistaPara = ticket_info.get("responseDue")
+                origem = ticket_info.get("source")
+                status = ticket_info.get("status", {})
+                tag = ticket_info.get("tag", [])
+                titulo = ticket_info.get("title")
 
-            # Add the ticket to the list
-            all_tickets.append({
-                "agente": agente,
-                "marca": marca,
-                "categoria": categoria,
-                "criadoEm": criadoEm,
-                "ultimaRespostaEm": ultimaRespostaEm,
-                "ultimaMudancaStatusEm": ultimaMudancaStatusEm,
-                "prioridade": prioridade,
-                "solicitante": solicitante,
-                "resolucaoPrevistaPara": resolucaoPrevistaPara,
-                "respostaPrevistaPara": respostaPrevistaPara,
-                "origem": origem,
-                "status": status,
-                "tag": tag,
-                "titulo": titulo
-            })
+                # Add the ticket to the list
+                all_tickets.append({
+                    "agente": agente,
+                    "marca": marca,
+                    "categoria": categoria,
+                    "criadoEm": criadoEm,
+                    "ultimaRespostaEm": ultimaRespostaEm,
+                    "ultimaMudancaStatusEm": ultimaMudancaStatusEm,
+                    "prioridade": prioridade,
+                    "solicitante": solicitante,
+                    "resolucaoPrevistaPara": resolucaoPrevistaPara,
+                    "respostaPrevistaPara": respostaPrevistaPara,
+                    "origem": origem,
+                    "status": status,
+                    "tag": tag,
+                    "titulo": titulo
+                })
 
-        if all_tickets:
-            return jsonify(all_tickets)
-        else:
-            return "Não existe tickets."
+            if all_tickets:
+                return jsonify(all_tickets)
+            else:
+                return "Não existe tickets."
 
-    return f"Falha ao consultar detalhes do ticket para UserID"
+        return f"Falha ao consultar detalhes do ticket para UserID"
 
 @app.route('/webhook/detalhesticket', methods=['GET']) 
 def dados_recebidos2():
