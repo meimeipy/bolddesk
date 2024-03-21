@@ -673,9 +673,9 @@ def agenteachado(dados, user_id):
                 "SMS": 23
             }
             
-        user_selection = dados.get('Categoria')
+        user_selection = dados.get('Categoriaa')
         if user_selection is None:
-            return "Categoria is required."
+            return "Categoriaa is required."
 
         if user_selection not in category_ids:
             return f"Invalid category: {user_selection}. Valid categories are: {', '.join(category_ids.keys())}"
