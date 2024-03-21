@@ -437,59 +437,66 @@ def acharoccliente(dadoss):
         except requests.exceptions.RequestException as e:
             return f"Falha na solicitação: {str(e)}"
 
+from datetime import datetime
+
 def Abrir_Ticket(user_id, dadoss):
-        dadoss = dict(dadoss)
-        extracted_data = {key: dadoss.get(key) for key in ["Assunto", "Categoria", "Descrição"]}
-        print("123", extracted_data)
-        category_ids = {
-            "Telefonia IP": 11,
-            "PABX IP": 12,
-            "Ramais Hardphone": 13,
-            "Ramais Softphone": 14,
-            "Ramais Agentes": 15,
-            "Call Center": 16,
-            "Sip Trunk": 17,
-            "Chat": 18,
-            "Omnichannel": 19,
-            "WhatsApp Web": 20,
-            "WhatsApp API Cloud": 21,
-            "Cloud Server": 22,
-            "SMS": 23
-        }
-        
-        user_selection = dadoss.get('Categoria')
-        category_id = category_ids[user_selection]
-        
-        now = datetime.utcnow()
-        dueDate = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    dadoss = dict(dadoss)
+    extracted_data = {key: dadoss.get(key) for key in ["Assunto", "Categoria", "Descrição"]}
+    print("123", extracted_data)
+    category_ids = {
+        "Telefonia IP": 11,
+        "PABX IP": 12,
+        "Ramais Hardphone": 13,
+        "Ramais Softphone": 14,
+        "Ramais Agentes": 15,
+        "Call Center": 16,
+        "Sip Trunk": 17,
+        "Chat": 18,
+        "Omnichannel": 19,
+        "WhatsApp Web": 20,
+        "WhatsApp API Cloud": 21,
+        "Cloud Server": 22,
+        "SMS": 23
+    }
     
+    user_selection = dadoss.get('Categoria')
+    category_id = category_ids[user_selection]
+    
+    now = datetime.utcnow()
+    dueDate = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+    # Generate the protocol
+    protocol = now.strftime("%Y%m%d%H%M%S%f")
+
+    # Append the protocol to the subject
+    subject_with_protocol = f"{extracted_data['Assunto']} - {protocol}"
+    
+    ticket_data = {
+        "brandId": 1,
+        "subject": subject_with_protocol,  # Use the subject with the protocol
+        "categoryId": category_id,  
+        "isVisibleInCustomerPortal": True,
+        "requesterId": user_id,  
+        "description": extracted_data['Descrição'],
+        "priorityId": 1,
+        "dueDate": dueDate,
+        "ticketPortalValue": 0
+    }
+    
+    url_ticket = "https://vittel.bolddesk.com/api/v1/tickets"
+    headers = {
+        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU=",
+    }
+    
+    response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
+    print("1", response_ull.status_code)
+    if response_ull.status_code == 201:
         
-        ticket_data = {
-            "brandId": 1,
-            "subject": extracted_data['Assunto'],
-            "categoryId": category_id,  
-            "isVisibleInCustomerPortal": True,
-            "requesterId": user_id,  
-            "description": extracted_data['Descrição'],
-            "priorityId": 1,
-            "dueDate": dueDate,
-            "ticketPortalValue": 0
-        }
-        
-        url_ticket = "https://vittel.bolddesk.com/api/v1/tickets"
-        headers = {
-            "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU=",
-        }
-        
-        response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
-        print("1", response_ull.status_code)
-        if response_ull.status_code == 201:
-            
-           print(response_ull.text)
-           
-           return "true", 201
-        else:
-            return "false", 400
+       print(response_ull.text)
+       
+       return "true", 201
+    else:
+        return "false", 400
 
 @app.route('/webhook/opent', methods=['POST']) 
 def dados_booti():
