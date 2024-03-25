@@ -674,12 +674,8 @@ def agenteachado(dados, user_id):
             }
             
         user_selection = dados.get('Categoriaa') or dados.get('Categoria')
-        if user_selection is None:
-            return "Either 'Categoriaa' or 'Categoria' is required."
-
-        if user_selection not in category_ids:
-            return f"Invalid category: {user_selection}. Valid categories are: {', '.join(category_ids.keys())}"
-
+        if results is None:
+            return "No results returned from API."
         category_id = category_ids[user_selection]
             
         all_tickets = []
