@@ -611,13 +611,13 @@ def encontrarcliente(dados):
         try:
             while True:
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
-                print("2", response_contatos.text)
+                
                 response_contatos.raise_for_status()
                 if params["Page"] >=21:
                     break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
-                    print("3", dados_bold_desk)
+                    
 
                     for contact in dados_bold_desk:
                         if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == format_cnpj_cpf(dados['cnpj_cpf']):
@@ -657,6 +657,7 @@ def agenteachado(dados, user_id):
     if response.status_code == 200:
         # Assuming the response is a JSON object with a 'result' field containing a list
         results = response.json().get("result", [])
+        print("11", results)
         category_ids = {
                 "Telefonia IP": 11,
                 "PABX IP": 12,
@@ -675,11 +676,13 @@ def agenteachado(dados, user_id):
             
         user_selection = dados.get('Categoriaa') or dados.get('Categoria')
         if results is None:
-            return "No results returned from API."
+            return "Não existe tickets."
         category_id = category_ids[user_selection]
             
         all_tickets = []
         for ticket_info in results:
+            print("Ticket category id:", ticket_info.get("category", {}).get("id"))
+            print("Selected category id:", category_id)
             # Extracting the required fields
             if ticket_info.get("category", {}).get("id") == category_id:
                 agente = ticket_info.get("agent", {})
@@ -714,7 +717,7 @@ def agenteachado(dados, user_id):
                     "tag": tag,
                     "titulo": titulo
                 })
-
+            print("33", all_tickets)
             if all_tickets:
                 return jsonify(all_tickets)
             else:

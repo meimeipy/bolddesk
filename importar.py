@@ -10,33 +10,26 @@ def importacsv():
     
     headers = {"x-api-key": api_key}
 
-    caminho_arquivo_csv = 'CLIENTES.csv'
+    caminho_arquivo_csv = 'listaclientes.csv'
 
     # Conjunto para armazenar IDs externos já adicionados
     ids_externos_adicionados = set()
-
-    with open(caminho_arquivo_csv, 'r', encoding='utf-8') as CLIENTES_csv:
-        leitor_csv = csv.reader(CLIENTES_csv, delimiter=';')
-
+   
+    with open(caminho_arquivo_csv, 'r', encoding='utf-8') as listaclientes_csv:
+        leitor_csv = csv.reader(listaclientes_csv, delimiter=',')
         for linha in leitor_csv:
             # Adicione mensagens de log para verificar os dados
             # print(f"Dados lidos: {linha[3]}")
-
-            # Se precisar substituir ',' por '.' para campos numéricos, faça isso diretamente
+          if len(linha) >= 8:
+            email = linha[7].replace('"', '').strip() # Se precisar substituir ',' por '.' para campos numéricos, faça isso diretamente
             dados_contato = {
                 'contactName': linha[3],
-                'emailId': linha[7],  
+                'emailId': email,
                 'contactDisplayName': linha[4],
                 'contactPhoneNo': linha[5],
                 'contactExternalReferenceId': linha[2],
             }
 
-            # Verifica se o ID externo já foi adicionado
-            if dados_contato['contactExternalReferenceId'] in ids_externos_adicionados:
-                print(f"Contato {linha[3]} já adicionado. Ignorando.")
-                continue
-
-            # Adiciona o ID externo ao conjunto
             ids_externos_adicionados.add(dados_contato['contactExternalReferenceId'])
 
             # Adicione uma mensagem de log para verificar os dados enviados
@@ -52,6 +45,7 @@ def importacsv():
                 print(f"Contato {linha[3]} adicionado com sucesso!")
             else:
                 print(f"Falha ao adicionar contato {linha[3]}. Código de status: {response.status_code}")
+                
 
             # Aguarde 1.5 segundos entre as chamadas para respeitar a taxa limite de 40 por minuto
             time.sleep(1.5)
