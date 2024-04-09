@@ -492,12 +492,9 @@ def Abrir_Ticket(user_id, dadoss):
     response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
     print("1", response_ull.status_code)
     if response_ull.status_code == 201:
-        
-       print(response_ull.text)
-       
-       return response_ull
+        return {"protocol": protocol, "status": "true", "code": 201}, 201
     else:
-        return "false", 400
+        return {"status": "false", "code": 400}, 400
 
 @app.route('/webhook/opent', methods=['POST']) 
 def dados_booti():
