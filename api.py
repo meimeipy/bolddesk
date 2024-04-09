@@ -495,7 +495,7 @@ def Abrir_Ticket(user_id, dadoss):
         
        print(response_ull.text)
        
-       return f"{protocol}", "true", 201
+       return response_ull
     else:
         return "false", 400
 
