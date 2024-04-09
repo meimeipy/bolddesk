@@ -495,7 +495,7 @@ def Abrir_Ticket(user_id, dadoss):
         
        print(response_ull.text)
        
-       return "true", 201
+       return f"{protocol}", "true", 201
     else:
         return "false", 400
 
@@ -645,14 +645,14 @@ def encontrarcliente(dados):
 def agenteachado(dados, user_id): 
     url_agente = f"https://vittel.bolddesk.com/api/v1/tickets/"
     params = {
-        "Q": [f"requester:[{user_id}]", "status:[1,2]"]
+        "Q": [f"requester:[{user_id}]", "status:[1,2,3]"]
     }
     headers = {
         "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
     }
 
     response = requests.get(url_agente, headers=headers, params=params)
-    print("22", response)
+    print("22", response.text)
 
     if response.status_code == 200:
         # Assuming the response is a JSON object with a 'result' field containing a list
