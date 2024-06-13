@@ -19,10 +19,6 @@ scheduler.start()
 def home():
     return "Hello, Flask!"
 
-if __name__ == "__main__":
-    app.run()
-
-
 def importa_registros(clientes_filtrados):
     if not isinstance(clientes_filtrados, list):
         clientes_filtrados = [clientes_filtrados]
