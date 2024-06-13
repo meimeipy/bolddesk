@@ -5,13 +5,13 @@ import schedule
 import csv
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from pytz import timezone
 app = Flask(__name__)
 
 def job():
     listar_cliente()
-
-scheduler = BackgroundScheduler()
+    
+scheduler = BackgroundScheduler(timezone=timezone('America/Sao_Paulo'))
 scheduler.add_job(func=job, trigger="interval", days=1, start_date='2022-01-01 00:00:00')
 scheduler.start()
 
