@@ -28,7 +28,7 @@ def importa_registros(clientes_filtrados):
         clientes_filtrados = [clientes_filtrados]
     url_tickets = "https://vittel.bolddesk.com/api/v1.0/tickets"
     url_contacts = 'https://vittel.bolddesk.com/api/v1/contacts'
-    api_key = "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+    api_key = "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     
     headers = {"x-api-key": api_key}
 
@@ -123,7 +123,7 @@ def listar_cliente():
 
 def adicionar_contato_bold_desk(cliente_fornecedor_detalhes):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
-    api_key = "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+    api_key = "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
 
     headers = {
         "x-api-key": api_key, "Content-Type": "application/json"
@@ -179,7 +179,7 @@ def webhook_handler():
 def list_items(cliente_fornecedor):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response_tickets = requests.get(url, headers=headers)
@@ -216,7 +216,7 @@ def list_items(cliente_fornecedor):
 def atualizar_dados(dados_bold_desk, cliente_fornecedor):    
     url = "https://vittel.bolddesk.com/api/v1/contacts"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }   
     novos_dados = cliente_fornecedor.get('event', {}).get('body', {}).get('event', {})
     print("3", novos_dados)
@@ -272,7 +272,7 @@ def webhook_att():
 def list_items(clientefornecedor):
     url_tickets = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response_tickets = requests.get(url_tickets, headers=headers)
@@ -324,7 +324,7 @@ def list_items(clientefornecedor):
 def excluir_para_spam(userid):
     url_delete_contact = f"https://vittel.bolddesk.com/api/v1/contacts"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
     data = {
         "contactId": [userid],
@@ -366,7 +366,7 @@ def formatt_cnpj_cpf(value):
 def buscacliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response_tickets = requests.get(url, headers=headers)
@@ -437,7 +437,7 @@ def formatt_cnpj_cpf(value):
 def acharocliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response_tickets = requests.get(url, headers=headers)
@@ -480,7 +480,7 @@ def acharocliente(dadoss):
 def consultar_detalhes_do_ticket(user_id):
     url_ticket = f"https://vittel.bolddesk.com/api/v1/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
    
     params = {
@@ -515,7 +515,7 @@ def formatt_cnpj_cpf(value):
 def acharoccliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response_tickets = requests.get(url, headers=headers)
@@ -605,7 +605,7 @@ def Abrir_Ticket(user_id, dadoss):
     
     url_ticket = "https://vittel.bolddesk.com/api/v1/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU=",
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=",
     }
     
     response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
@@ -631,7 +631,7 @@ def formatt_cnpj_cpf(value):
 def acharocliente(dadoss):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response_tickets = requests.get(url, headers=headers)
@@ -676,7 +676,7 @@ def acharocliente(dadoss):
 def consultar_detalhes_do_ticket(user_id):
     url_ticket = f"https://vittel.bolddesk.com/api/v1/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
    
     params = {
@@ -712,7 +712,7 @@ def format_cnpj_cpf(value):
 def encontrarcliente(dados):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response_tickets = requests.get(url, headers=headers)
@@ -764,7 +764,7 @@ def agenteachado(dados, user_id):
         "Q": [f"requester:[{user_id}]", "status:[1,2,3]"]
     }
     headers = {
-        "x-api-key": "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }
 
     response = requests.get(url_agente, headers=headers, params=params)
