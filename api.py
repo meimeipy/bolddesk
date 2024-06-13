@@ -1,7 +1,126 @@
 from flask import Flask, request, jsonify
 from datetime import datetime
 import requests
+import schedule
+import csv
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
+
 app = Flask(__name__)
+
+def job():
+    listar_cliente()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=job, trigger="interval", days=1, start_date='2022-01-01 00:00:00')
+scheduler.start()
+
+@app.route('/')
+def home():
+    return "Hello, Flask!"
+
+if __name__ == "__main__":
+    app.run()
+
+
+def importa_registros(clientes_filtrados):
+    if not isinstance(clientes_filtrados, list):
+        clientes_filtrados = [clientes_filtrados]
+    url_tickets = "https://vittel.bolddesk.com/api/v1.0/tickets"
+    url_contacts = 'https://vittel.bolddesk.com/api/v1/contacts'
+    api_key = "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
+    
+    headers = {"x-api-key": api_key}
+
+    processados = set()
+    for registro in clientes_filtrados:
+        telefone1_ddd = registro['telefone1_ddd'] if registro['telefone1_ddd'] else ''
+        telefone1_numero = registro['telefone1_numero'] if registro['telefone1_numero'] else ''
+        if registro['cnpj_cpf'] in processados:
+            print(f"Contato {registro['nome']} já processado, pulando...")
+            continue
+        processados.add(registro['cnpj_cpf'])
+        dados_contato = {
+            'contactName': registro['razao_social'],
+            'emailId': registro['email'],
+            'contactDisplayName': registro['nome_fantasia'],
+            'contactPhoneNo': telefone1_ddd + telefone1_numero,
+            'contactExternalReferenceId': registro['cnpj_cpf'],
+        }
+
+        # Adicione uma menagem de log para verificar os dados enviados
+        print(f"Dados enviados para a API: {dados_contato}")
+
+        response = requests.post(url_contacts, json=dados_contato, headers=headers)
+
+        # Adicione mensagens de log para verificar a resposta da API
+        print(f"Resposta da API: {response.status_code}")
+        print(response.text)
+
+        if response.status_code == 200:
+            print(f"Contato {registro.get('nome', 'Unknown')} adicionado com sucesso!")
+        else:
+            print(f"Falha ao adicionar contato {registro.get('nome', 'Unknown')}. Código de status: {response.status_code}")
+        # Aguarde 1.5 segundos entre as chamadas para respeitar a taxa limite de 40 por minuto
+        time.sleep(1.5)
+@app.route('/webhook/importar', methods=['POST'])
+def listar_cliente():
+ 
+    url = "https://app.omie.com.br/api/v1/geral/clientes/"
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "call": "ListarClientes",
+        "app_key": "4024681641981",
+        "app_secret": "8fb7e54bce3344f6ac60fca754878f6d",
+        "param": [
+            {
+                "pagina": 1,
+                "registros_por_pagina": 1,  # Fetch only one record to get the total count
+                "apenas_importado_api": "N"
+            }
+        ]
+    }
+
+    # Make an initial request to get the total number of records
+    response = requests.post(url, headers=headers, json=data)
+    response_data = response.json()
+    total_de_registros = response_data.get("total_de_registros", 0)
+    print("total_de_registros", total_de_registros)
+    # Update the 'registros_por_pagina' parameter to fetch all records
+    data["param"][0]["registros_por_pagina"] = total_de_registros
+
+    # Make a second request to fetch all records
+    # Make a second request to fetch all records
+    # Make a second request to fetch all records
+    response = requests.post(url, headers=headers, json=data)
+    response_data = response.json()
+    clientes = response_data.get('clientes_cadastro', [])
+    clientes_filtrados = []
+    start_cnpj_cpf = '14.512.528/0001-54'  # Replace with your actual start CNPJ/CPF
+    start_fetching = False
+
+    if isinstance(clientes, list):
+        for registro in clientes:
+            cliente_filtrado = {
+                'cnpj_cpf': registro.get('cnpj_cpf'),
+                'email': registro.get('email'),
+                'nome_fantasia': registro.get('nome_fantasia'),
+                'razao_social': registro.get('razao_social'),
+                'telefone1_ddd': registro.get('telefone1_ddd'),
+                'telefone1_numero': registro.get('telefone1_numero'),
+            }
+            if cliente_filtrado['cnpj_cpf'] == start_cnpj_cpf:
+                start_fetching = True
+            if start_fetching:
+                clientes_filtrados.append(cliente_filtrado)
+                print("registros filtrados", cliente_filtrado)
+    else:
+        print(f"Erro: 'registros' não é uma lista. Valor atual: {clientes}")
+
+    importa_registros(clientes_filtrados)    
+    return jsonify(response_data)
+# Agora, todos_registros contém todos os registros da API
+
 def adicionar_contato_bold_desk(cliente_fornecedor_detalhes):
     url = "https://vittel.bolddesk.com/api/v1.0/tickets"
     api_key = "mYmIMgJNC0/aayRpdqcaYKoh+O+E2Jta6WbGl+Z8zyU="
