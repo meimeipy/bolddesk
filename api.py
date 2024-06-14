@@ -9,15 +9,12 @@ from pytz import timezone
 app = Flask(__name__)
 
 def job():
-    listar_cliente()
+    with app.app_context():
+        listar_cliente()
     
 scheduler = BackgroundScheduler(timezone=timezone('America/Sao_Paulo'))
 scheduler.add_job(func=job, trigger="interval", days=1, start_date='2022-01-01 00:00:00')
 scheduler.start()
-
-@app.route('/')
-def home():
-    return "Hello, Flask!"
 
 def importa_registros(clientes_filtrados):
     if not isinstance(clientes_filtrados, list):
