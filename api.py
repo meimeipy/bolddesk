@@ -553,6 +553,7 @@ from datetime import datetime
 
 def Abrir_Ticket(user_id, dadoss):
     dadoss = dict(dadoss)
+    user_id = user_id
     extracted_data = {key: dadoss.get(key) for key in ["Assunto", "Categoria", "Descrição"]}
     print("123", extracted_data)
     category_ids = {
