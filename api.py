@@ -6,7 +6,13 @@ import csv
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import timezone
+import logging
+
+# Configure logging
+
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.DEBUG)
 
 def job():
     with app.app_context():
@@ -604,10 +610,14 @@ def Abrir_Ticket(user_id, dadoss):
     
     response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
     print("1", response_ull.status_code)
+    logging.debug(f"Response: {response_ull.text}")
     if response_ull.status_code == 201:
         print(f"user_id: {user_id}")
+        logging.debug(f"user_id: {user_id}")
         response_data = {"protocol": protocol, "assunto": assunto, "user_id": user_id, "status": "true", "code": 201}
         print("Response data:", response_data)
+        logging.debug(f"Response data: {response_data}")
+        
         return response_data, 201
     else:
         print("2", response_ull.text)
