@@ -637,6 +637,7 @@ def dados_booti():
 @app.route('/webhook/get-sender-name/<conversationId>/<user_id>/<assunto>', methods=['GET'])
 def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
     try:
+        user_id = int(user_id)
         url = "https://vittel.bolddesk.com/api/v1/tickets/"
         headers = {
             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
