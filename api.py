@@ -648,7 +648,7 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
             dados = response.json()
             
             for ticket in dados['result']:
-                if ticket['title'] == assunto and ticket['requestedBy']['userId'] == int(user_id):
+                if ticket['title'] == assunto and ticket['userId'] == int(user_id):
                     ticketId = ticket['ticketId']
                     
                     # Obtém o nome do remetente
