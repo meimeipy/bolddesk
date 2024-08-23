@@ -7,12 +7,12 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import timezone
 import logging
+import json
 
 # Configure logging
-
+logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
 
 def job():
     with app.app_context():
@@ -48,13 +48,11 @@ def importa_registros(clientes_filtrados):
         }
 
         # Adicione uma menagem de log para verificar os dados enviados
-        print(f"Dados enviados para a API: {dados_contato}")
 
         response = requests.post(url_contacts, json=dados_contato, headers=headers)
 
         # Adicione mensagens de log para verificar a resposta da API
-        print(f"Resposta da API: {response.status_code}")
-        print(response.text)
+
 
         if response.status_code == 200:
             print(f"Contato {registro.get('nome', 'Unknown')} adicionado com sucesso!")
@@ -598,6 +596,7 @@ def Abrir_Ticket(user_id, dadoss):
         "isVisibleInCustomerPortal": True,
         "requesterId": user_id,  
         "description": extracted_data['Descrição'],
+        "agentId": None,
         "priorityId": 1,
         "dueDate": dueDate,
         "ticketPortalValue": 0
@@ -634,53 +633,161 @@ def dados_booti():
     else:
         return jsonify({"message": "Os parâmetros são necessários"}), 400
 #############################################################################################
+# @app.route('/webhook/get-sender-name/<conversationId>/<user_id>/<assunto>', methods=['GET'])
+# def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
+#     print("1issues", conversationId, user_id, assunto)
+#     try:
+#         logging.debug(f"Parâmetros recebidos: conversationId={conversationId}, user_id={user_id}, assunto={assunto}")
+#         url = "https://vittel.bolddesk.com/api/v1/tickets/"
+#         headers = {
+#             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
+#         }
+#         response = requests.get(url, headers=headers)
+#         logging.debug(f"Resposta da API: {response.status_code}")
+#         print("1buscar_ticket", response.json())
+#         if response.status_code == 200 or response.status_code == 201:
+#             dados = response.json()
+            
+#             for ticket in dados['result']:
+#                 if ticket['title'] == assunto and ticket['requestedBy']['userId'] == user_id:
+#                     ticketId = ticket['ticketId']
+#                     print("2buscar_ticket", ticketId)
+#                     # Obtém o nome do remetente
+#                     sender_name = get_sender_name(conversationId, ticketId)
+                    
+#                     if sender_name:
+#                         # Edita o ticket para atualizar o agente
+#                         update_status = editar_ticket(ticketId, agent_name=sender_name)
+#                         return jsonify({"status": update_status})
+#                     else:
+#                         return "Nome do remetente não encontrado."
+
+#             return "Ticket não encontrado para o título e ID de usuário fornecidos."
+        
+#         else:
+#             return f"Erro ao fazer a requisição: {response.status_code}"
+    
+#     except Exception as e:
+#         return f"Ocorreu um erro: {str(e)}"
 @app.route('/webhook/get-sender-name/<conversationId>/<user_id>/<assunto>', methods=['GET'])
 def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
     try:
-        user_id = int(user_id)
-        url = "https://vittel.bolddesk.com/api/v1/tickets/"
+        logging.debug(f"Parâmetros recebidos: conversationId={conversationId}, user_id={user_id}, assunto={assunto}")
+        base_url = "https://vittel.bolddesk.com/api/v1/tickets"
         headers = {
             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
         }
-        response = requests.get(url, headers=headers)
-        
-        if response.status_code == 200:
-            dados = response.json()
-            
-            for ticket in dados['result']:
-                if ticket['title'] == assunto and ticket['userId'] == int(user_id):
-                    ticketId = ticket['ticketId']
-                    
-                    # Obtém o nome do remetente
-                    sender_name = get_sender_name(conversationId, ticketId)
-                    
-                    if sender_name:
-                        # Edita o ticket para atualizar o agente
-                        update_status = editar_ticket(ticketId, agent_name=sender_name)
-                        return jsonify({"status": update_status})
-                    else:
-                        return "Nome do remetente não encontrado."
+        page = 1
+        per_page = 40  # Número de tickets por página
+        encontrado = False
 
-            return "Ticket não encontrado para o título e ID de usuário fornecidos."
-        
-        else:
-            return f"Erro ao fazer a requisição: {response.status_code}"
-    
+        while not encontrado:
+            url = f"{base_url}?OrderBy=ticketId desc&Page={page}&PerPage={per_page}"
+            response = requests.get(url, headers=headers)
+            logging.debug(f"Resposta da API: {response.status_code}")
+            response_data = response.json()
+            print("1buscar_ticket", response_data)
+
+            if response.status_code in [200, 201]:
+                dados = response_data.get("result", [])
+
+                if not isinstance(dados, list):
+                    return "Formato de resposta inesperado da API."
+
+                for ticket in dados:
+                    ticket_title = ticket['title']
+                    ticket_user_id = ticket['requestedBy']['userId']
+                    print(f"Comparando título: {ticket_title} com {assunto}")
+                    print(f"Comparando user_id: {ticket_user_id} com {user_id}")
+
+                    if ticket_title == assunto and ticket_user_id == int(user_id):
+                        ticketId = ticket['ticketId']
+                        print("2buscar_ticket", ticketId)
+                        
+                        sender_name = get_sender_name(conversationId, ticketId)
+
+                        if sender_name:
+                            update_status = editar_ticket(ticketId, sender_name)
+                            return jsonify({"status": update_status})
+                        else:
+                            return "Nome do remetente não encontrado."
+
+                if not dados:
+                    break  # Não há mais tickets para consultar
+                page += 1
+            else:
+                return f"Erro ao fazer a requisição: {response.status_code}"
+
+        return "Ticket não encontrado para o título e ID de usuário fornecidos."
     except Exception as e:
         return f"Ocorreu um erro: {str(e)}"
+# def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
+#     try:
+#         logging.debug(f"Parâmetros recebidos: conversationId={conversationId}, user_id={user_id}, assunto={assunto}")
+#         base_url = "https://vittel.bolddesk.com/api/v1/tickets"
+#         headers = {
+#             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
+#         }
+#         page = 1
+#         per_page= 40
+#         encontraDO = False
+        
+#         url = f"{base_url}?OrderBy=ticketId desc&Page={page}&PerPage={per_page}"
+#         response = requests.get(url, headers=headers)
+#         logging.debug(f"Resposta da API: {response.status_code}")
+#         response_data = response.json()
+#         print("1buscar_ticket", response_data)
 
+#         if response.status_code in [200, 201]:
+#             dados = response_data.get("result", [])
+
+#             if not isinstance(dados, list):
+#                 return "Formato de resposta inesperado da API."
+
+#             for ticket in dados:
+#                 # Dividir o título no traço e pegar a primeira parte
+#                 ticket_title = ticket['title']
+#                 ticket_user_id = ticket['requestedBy']['userId']
+#                 print(f"Comparando título: {ticket_title} com {assunto}")
+#                 print(f"Comparando user_id: {ticket_user_id} com {user_id}")
+
+#                 if ticket_title == assunto and ticket_user_id == int(user_id):
+#                     ticketId = ticket['ticketId']
+#                     print("2buscar_ticket", ticketId)
+                    
+#                     sender_name = get_sender_name(conversationId, ticketId)
+
+#                     if sender_name:
+                        
+#                         update_status = editar_ticket(ticketId, agent_name=sender_name)
+#                         return jsonify({"status": update_status})
+#                     else:
+#                         return "Nome do remetente não encontrado."
+
+#             return "Ticket não encontrado para o título e ID de usuário fornecidos."
+#         else:
+#             return f"Erro ao fazer a requisição: {response.status_code}"
+#     except Exception as e:
+#         return f"Ocorreu um erro: {str(e)}"
 def get_sender_name(conversationId, ticketId):
     url = f'https://chat.omnigo.com.br/api/v1/accounts/1/conversations/{conversationId}'
-    response = requests.get(url)
-    
+    headers = {
+        "api_access_token": "8BNDLDVBN8nw4AmArzsHghZx"
+    }
+    response = requests.get(url, headers=headers)
+    print("1get_sender_name", response.json())
     if response.status_code == 200:
-        data = response.json()
-        return data.get('meta', {}).get('sender', {}).get('name', None)
-    
-    return None
+        try:
+            data = response.json()
+            sender_name = data['last_non_activity_message']['sender']['name']
+            print("2get_sender_name", sender_name)
+            return sender_name
+        except KeyError as e:
+            return f"Chave não encontrada: {str(e)}"
+        except json.JSONDecodeError as e:
+            return f"Erro ao decodificar JSON: {str(e)}"
 
-
-def editar_ticket(ticketId, agent_name):
+def editar_ticket(ticketId, sender_name):
     # URL para buscar detalhes dos agentes
     agents_url = "https://vittel.bolddesk.com/api/v1/agents"
     headers = {
@@ -690,37 +797,86 @@ def editar_ticket(ticketId, agent_name):
     
     # Fazendo a requisição para obter a lista de agentes
     response = requests.get(agents_url, headers=headers)
-    
+    print("2editar_ticket", response.json())
     if response.status_code != 200:
         return f"Falha ao buscar o agente: {response.status_code}"
     
-    agents = response.json()
+    agents_response = response.json()
+    if not isinstance(agents_response, dict) or 'result' not in agents_response:
+        return "Formato de resposta inesperado da API."
+    
+    agents = agents_response['result']
+    if not isinstance(agents, list):
+        return "Formato de resposta inesperado da API."
     
     # Filtrar o agente pelo nome
-    agent_info = next((agent for agent in agents if agent['name'] == agent_name), None)
-    
+    agent_info = next((agent for agent in agents if agent['name'] == sender_name), None)
+    print("3editar_ticket", agent_info)
     if not agent_info:
         return "Agente não encontrado."
     
     # Preparar os dados para atualizar o ticket
-    url = f"https://vittel.bolddesk.com/api/v1/tickets/{ticketId}"
+    url = f"https://vittel.bolddesk.com/api/v1/tickets/{ticketId}/update_fields"
     payload = {
         "fields": {
-            "agent": {
-                "id": agent_info['userId'],
-                "name": agent_info['name'],
-                "emailId": agent_info['emailId']
-            }
+            "agentid": agent_info['userId'],
+
+            },
+            "notes": "Agente atualizado via API."
         }
-    }
+
+  
     
     # Fazendo a requisição para atualizar o ticket
     response = requests.put(url, headers=headers, json=payload)
+    print("4editar_ticket", response.json())
     
     if response.status_code == 200:
         return "Ticket atualizado com sucesso."
     else:
         return f"Falha ao atualizar o ticket: {response.status_code}"
+# def editar_ticket(ticketId, sender_name):
+#     # URL para buscar detalhes dos agentes
+#     agents_url = "https://vittel.bolddesk.com/api/v1/agents"
+#     headers = {
+#         "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=",
+#         "Content-Type": "application/json"
+#     }
+    
+#     # Fazendo a requisição para obter a lista de agentes
+#     response = requests.get(agents_url, headers=headers)
+#     print("2editar_ticket", response.json())
+#     if response.status_code != 200:
+#         return f"Falha ao buscar o agente: {response.status_code}"
+    
+#     agents = response.json()
+#     if not isinstance(agents, list):
+#         return "Formato de resposta inesperado da API."
+#     # Filtrar o agente pelo nome
+#     agent_info = next((agent for agent in agents if agent['name'] == sender_name), None)
+#     print("3editar_ticket", agent_info)
+#     if not agent_info:
+#         return "Agente não encontrado."
+    
+#     # Preparar os dados para atualizar o ticket
+#     url = f"https://vittel.bolddesk.com/api/v1/tickets/{ticketId}"
+#     payload = {
+#         "fields": {
+#             "agent": {
+#                 "id": agent_info['userId'],
+#                 "name": agent_info['name'],
+#                 "emailId": agent_info['emailId']
+#             }
+#         }
+#     }
+    
+#     # Fazendo a requisição para atualizar o ticket
+#     response = requests.put(url, headers=headers, json=payload)
+    
+#     if response.status_code == 200:
+#         return "Ticket atualizado com sucesso."
+#     else:
+#         return f"Falha ao atualizar o ticket: {response.status_code}"
 
 #############################################################################################
 def formatt_cnpj_cpf(value):
