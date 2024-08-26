@@ -675,7 +675,6 @@ def dados_booti():
 #         return f"Ocorreu um erro: {str(e)}"
 @app.route('/webhook/get-sender-name/<conversationId>/<user_id>/<assunto>', methods=['GET'])
 def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
-    time.sleep(60)
     try:
         logging.debug(f"Parâmetros recebidos: conversationId={conversationId}, user_id={user_id}, assunto={assunto}")
         base_url = "https://vittel.bolddesk.com/api/v1/tickets"
@@ -684,7 +683,6 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
         }
         page = 1
         per_page = 10  # Número de tickets por página
-
         while True:
             url = f"{base_url}?OrderBy=ticketId desc&Page={page}&PerPage={per_page}"
             response = requests.get(url, headers=headers)
@@ -706,7 +704,6 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
                     if ticket_title == assunto and ticket_user_id == int(user_id):
                         ticketId = ticket['ticketId']
                         print("2buscar_ticket", ticketId)
-
                         sender_name = get_sender_name(conversationId, ticketId)
 
                         if sender_name:
@@ -714,7 +711,7 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
                             return jsonify({"status": update_status})
                         else:
                             return "Nome do remetente não encontrado."
-
+                    
                 if not dados:
                     break  # Não há mais tickets para consultar
 
