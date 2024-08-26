@@ -675,9 +675,10 @@ def dados_booti():
 #         return f"Ocorreu um erro: {str(e)}"
 @app.route('/webhook/get-sender-name/<conversationId>/<user_id>/<assunto>', methods=['GET'])
 def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
+    time.sleep(60)
     try:
         logging.debug(f"Parâmetros recebidos: conversationId={conversationId}, user_id={user_id}, assunto={assunto}")
-        base_url = "https://vittel.bolddesk.com/api/v1/tickets"
+        base_url = "https://vittle.bolddesk.com/api/v1/tickets"
         headers = {
             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
         }
