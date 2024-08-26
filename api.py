@@ -612,12 +612,13 @@ def Abrir_Ticket(user_id, dadoss):
     }
     
     response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
-    print("1", response_ull.status_code)
+    print("to aqui", response_ull.json())
     logging.debug(f"Response: {response_ull.text}")
     if response_ull.status_code == 201:
         print(f"user_id: {user_id}")
         logging.debug(f"user_id: {user_id}")
-        response_data = {"protocol": protocol, "assunto": assunto, "user_id": user_id, "status": "true", "code": 201}
+        ticketId = response_ull.json().get("id")
+        response_data = {"protocol": protocol, "assunto": assunto, "user_id": user_id, "ticketId": ticketId, "status": "true", "code": 201}
         print("Response data:", response_data)
         logging.debug(f"Response data: {response_data}")
         
