@@ -506,20 +506,26 @@ def dados_boot():
     
 ################################################################################################    
     # ABRIR TICKET
+# def formatt_cnpj_cpf(value):
+#     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
+import re
+
 def formatt_cnpj_cpf(value):
-    return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
-
-def acharoccliente(dadoss):
-    url = "https://vittel.bolddesk.com/api/v1.0/tickets"
-    headers = {
-        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
-    }
-
-    response_tickets = requests.get(url, headers=headers)
+    # Remover todos os caracteres não numéricos
+    value = re.sub(r'\D', '', value)
     
-
-    if response_tickets.status_code == 200:
+    # Verificar o comprimento para determinar se é CNPJ ou CPF
+    if len(value) == 14:  # CNPJ
+        return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
+    elif len(value) == 11:  # CPF
+        return f"{value[:3]}.{value[3:6]}.{value[6:9]}-{value[9:]}"
+    else:
+        return "Formato inválido"
+def acharoccliente(dadoss):
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
+        headers = {
+            "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
+        }
         params = {
             "PerPage": 40,
             "Page": 1,
@@ -529,8 +535,6 @@ def acharoccliente(dadoss):
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
                 
                 response_contatos.raise_for_status()
-                if params["Page"] >= 21:
-                    break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
                     
