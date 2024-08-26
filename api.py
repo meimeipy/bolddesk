@@ -641,6 +641,7 @@ def dados_booti():
 # Atualizar ticket
 @app.route('/webhook/get-sender-name/<conversationId>/<ticketId>', methods=['GET'])
 def get_sender_name(conversationId, ticketId):
+    time.sleep(60)
     url = f'https://chat.omnigo.com.br/api/v1/accounts/1/conversations/{conversationId}'
     headers = {
         "api_access_token": "8BNDLDVBN8nw4AmArzsHghZx"
