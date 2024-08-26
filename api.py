@@ -784,10 +784,8 @@ def get_sender_name(conversationId, ticketId):
                 sender_name = data['last_non_activity_message']['sender']['name']
                 print("2get_sender_name", sender_name)
                 return sender_name
-            except KeyError as e:
-                return f"Chave não encontrada: {str(e)}"
-            except json.JSONDecodeError as e:
-                return f"Erro ao decodificar JSON: {str(e)}"
+            except KeyError:
+                pass
         time.sleep(30)
 
 def editar_ticket(ticketId, sender_name):
