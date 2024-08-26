@@ -682,15 +682,13 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
         }
         page = 1
-        per_page = 40  # Número de tickets por página
-        encontrado = False
+        per_page = 10  # Número de tickets por página
 
-        while not encontrado:
+        while True:
             url = f"{base_url}?OrderBy=ticketId desc&Page={page}&PerPage={per_page}"
             response = requests.get(url, headers=headers)
             logging.debug(f"Resposta da API: {response.status_code}")
             response_data = response.json()
-            print("1buscar_ticket", response_data)
 
             if response.status_code in [200, 201]:
                 dados = response_data.get("result", [])
@@ -707,7 +705,7 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
                     if ticket_title == assunto and ticket_user_id == int(user_id):
                         ticketId = ticket['ticketId']
                         print("2buscar_ticket", ticketId)
-                        
+
                         sender_name = get_sender_name(conversationId, ticketId)
 
                         if sender_name:
@@ -718,6 +716,7 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
 
                 if not dados:
                     break  # Não há mais tickets para consultar
+
                 page += 1
             else:
                 return f"Erro ao fazer a requisição: {response.status_code}"
@@ -725,6 +724,58 @@ def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
         return "Ticket não encontrado para o título e ID de usuário fornecidos."
     except Exception as e:
         return f"Ocorreu um erro: {str(e)}"
+
+# def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
+#     try:
+#         logging.debug(f"Parâmetros recebidos: conversationId={conversationId}, user_id={user_id}, assunto={assunto}")
+#         base_url = "https://vittel.bolddesk.com/api/v1/tickets"
+#         headers = {
+#             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
+#         }
+#         page = 1
+#         per_page = 10 # Número de tickets por página
+#         encontrado = False
+
+#         while not encontrado:
+#             url = f"{base_url}?OrderBy=ticketId desc&Page={page}&PerPage={per_page}"
+#             response = requests.get(url, headers=headers)
+#             logging.debug(f"Resposta da API: {response.status_code}")
+#             response_data = response.json()
+#             print("1buscar_ticket", response_data)
+
+#             if response.status_code in [200, 201]:
+#                 dados = response_data.get("result", [])
+
+#                 if not isinstance(dados, list):
+#                     return "Formato de resposta inesperado da API."
+
+#                 for ticket in dados:
+#                     ticket_title = ticket['title']
+#                     ticket_user_id = ticket['requestedBy']['userId']
+#                     print(f"Comparando título: {ticket_title} com {assunto}")
+#                     print(f"Comparando user_id: {ticket_user_id} com {user_id}")
+
+#                     if ticket_title == assunto and ticket_user_id == int(user_id):
+#                         ticketId = ticket['ticketId']
+#                         print("2buscar_ticket", ticketId)
+                        
+#                         sender_name = get_sender_name(conversationId, ticketId)
+
+#                         if sender_name:
+#                             update_status = editar_ticket(ticketId, sender_name)
+#                             return jsonify({"status": update_status})
+#                         else:
+#                             return "Nome do remetente não encontrado."
+
+#                 if not dados:
+#                     break  # Não há mais tickets para consultar
+#                 page += 1
+#             else:
+#                 return f"Erro ao fazer a requisição: {response.status_code}"
+
+#         return "Ticket não encontrado para o título e ID de usuário fornecidos."
+#     except Exception as e:
+#         return f"Ocorreu um erro: {str(e)}"
 # def buscar_ticket_por_titulo_e_usuario(conversationId, user_id, assunto):
 #     try:
 #         logging.debug(f"Parâmetros recebidos: conversationId={conversationId}, user_id={user_id}, assunto={assunto}")
