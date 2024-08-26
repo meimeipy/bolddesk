@@ -554,6 +554,7 @@ def acharoccliente(dadoss):
             return f"Falha na solicitação: {str(e)}"
 
 from datetime import datetime
+import time
 
 def Abrir_Ticket(user_id, dadoss):
     dadoss = dict(dadoss)
@@ -774,18 +775,20 @@ def get_sender_name(conversationId, ticketId):
     headers = {
         "api_access_token": "8BNDLDVBN8nw4AmArzsHghZx"
     }
-    response = requests.get(url, headers=headers)
-    print("1get_sender_name", response.json())
-    if response.status_code == 200:
-        try:
-            data = response.json()
-            sender_name = data['last_non_activity_message']['sender']['name']
-            print("2get_sender_name", sender_name)
-            return sender_name
-        except KeyError as e:
-            return f"Chave não encontrada: {str(e)}"
-        except json.JSONDecodeError as e:
-            return f"Erro ao decodificar JSON: {str(e)}"
+    while True:
+        response = requests.get(url, headers=headers)
+        print("1get_sender_name", response.json())
+        if response.status_code == 200:
+            try:
+                data = response.json()
+                sender_name = data['last_non_activity_message']['sender']['name']
+                print("2get_sender_name", sender_name)
+                return sender_name
+            except KeyError as e:
+                return f"Chave não encontrada: {str(e)}"
+            except json.JSONDecodeError as e:
+                return f"Erro ao decodificar JSON: {str(e)}"
+        time.sleep(30)
 
 def editar_ticket(ticketId, sender_name):
     # URL para buscar detalhes dos agentes
