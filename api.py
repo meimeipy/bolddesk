@@ -407,7 +407,7 @@ def buscacliente(dadoss):
 @app.route('/webhook/consultaclienteid', methods=['GET']) 
 def dados_rece():
     token = request.args.get('token')
-    if token != '1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=':
+    if token != "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=":
         return jsonify({"message": "Token inválido"}), 401
     dadoss = request.args  
     
@@ -490,7 +490,7 @@ def consultar_detalhes_do_ticket(user_id):
 @app.route('/webhook/consultat', methods=['GET']) 
 def dados_boot():
     token = request.args.get('token')
-    if token != '1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=':
+    if token != "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=":
         return jsonify({"message": "Token inválido"}), 401
     dadoss = request.args  
     print("12", dadoss)
@@ -629,7 +629,7 @@ def Abrir_Ticket(user_id, dadoss):
 @app.route('/webhook/opent', methods=['POST']) 
 def dados_booti():
     token = request.args.get('token')
-    if token != '1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=':
+    if token != "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=":
         return jsonify({"message": "Token inválido"}), 401
     dadoss = request.args  
     print("12", dadoss)
@@ -643,7 +643,7 @@ def dados_booti():
 @app.route('/webhook/get-sender-name/<conversationId>/<ticketId>', methods=['GET'])
 def get_sender_name(conversationId, ticketId):
     token = request.args.get('token')
-    if token != '1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=':
+    if token != "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=":
         return jsonify({"message": "Token inválido"}), 401
     url = f'https://chat.omnigo.com.br/api/v1/accounts/1/conversations/{conversationId}'
     headers = {
@@ -833,7 +833,7 @@ def consultar_detalhes_do_ticket(user_id):
 @app.route('/webhook/deletarticket', methods=['DEL']) 
 def handle_delete_ticket_request():
     token = request.args.get('token')
-    if token != '1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=':
+    if token != "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=":
         return jsonify({"message": "Token inválido"}), 401
     dadoss = request.args  
     print("12", dadoss)
@@ -975,7 +975,7 @@ def agenteachado(dados, user_id):
 @app.route('/webhook/detalhesticket', methods=['GET']) 
 def dados_recebidos2():
     token = request.args.get('token')
-    if token != '1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=':
+    if token != "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=":
         return jsonify({"message": "Token inválido"}), 401
     dados = request.args  
     print("12", dados)
