@@ -82,7 +82,6 @@ def listar_cliente():
     response = requests.post(url, headers=headers, json=data)
     response_data = response.json()
     total_de_registros = response_data.get("total_de_registros", 0)
-    print("total_de_registros", total_de_registros)
     # Update the 'registros_por_pagina' parameter to fetch all records
     data["param"][0]["registros_por_pagina"] = total_de_registros
 
@@ -376,7 +375,6 @@ def buscacliente(dadoss):
         try:
             while True:
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
-                print("2", response_contatos.text)
                 response_contatos.raise_for_status()
                 if params["Page"] >=21:
                     break
@@ -830,18 +828,13 @@ def format_cnpj_cpf(value):
     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
 def encontrarcliente(dados):
-    url = "https://vittel.bolddesk.com/api/v1.0/tickets"
-    headers = {
-        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
-    }
-
-    response_tickets = requests.get(url, headers=headers)
-    print("1", response_tickets)
-
-    if response_tickets.status_code == 200:
+        requests_cache.install_cache('api_cache', expire_after=600)
+        headers = {
+            "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
+        }
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         params = {
-            "PerPage": 40,
+            "PerPage": 100,
             "Page": 1,
         }
         try:
@@ -893,7 +886,6 @@ def agenteachado(dados, user_id):
     if response.status_code == 200:
         # Assuming the response is a JSON object with a 'result' field containing a list
         results = response.json().get("result", [])
-        print("11", results)
         category_ids = {
                 "Telefonia IP": 11,
                 "PABX IP": 12,
@@ -917,8 +909,6 @@ def agenteachado(dados, user_id):
             
         all_tickets = []
         for ticket_info in results:
-            print("Ticket category id:", ticket_info.get("category", {}).get("id"))
-            print("Selected category id:", category_id)
             # Extracting the required fields
             if ticket_info.get("category", {}).get("id") == category_id:
                 agente = ticket_info.get("agent", {})
