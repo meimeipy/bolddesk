@@ -642,7 +642,8 @@ def get_sender_name(conversationId, ticketId):
     if response.status_code == 200:
         try:
             data = response.json()
-            sender_name = data['last_non_activity_message']['sender']['name']
+            print("1get_sender_name", data)
+            sender_name = data['meta']['assignee']['name']
             print("2get_sender_name", sender_name)
             result = editar_ticket(ticketId, sender_name)
             return jsonify({"message": result})
