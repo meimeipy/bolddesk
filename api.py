@@ -633,7 +633,6 @@ def dados_booti():
 # Atualizar ticket
 @app.route('/webhook/get-sender-name/<conversationId>/<ticketId>', methods=['GET'])
 def get_sender_name(conversationId, ticketId):
-    
     url = f'https://chat.omnigo.com.br/api/v1/accounts/1/conversations/{conversationId}'
     headers = {
         "api_access_token": "8BNDLDVBN8nw4AmArzsHghZx"
@@ -645,60 +644,67 @@ def get_sender_name(conversationId, ticketId):
             data = response.json()
             sender_name = data['last_non_activity_message']['sender']['name']
             print("2get_sender_name", sender_name)
-            return editar_ticket(ticketId, sender_name)
+            result = editar_ticket(ticketId, sender_name)
+            return jsonify({"message": result})
         except KeyError as e:
-            return f"Chave não encontrada: {str(e)}"
+            return jsonify({"error": f"Chave não encontrada: {str(e)}"}), 400
         except json.JSONDecodeError as e:
-            return f"Erro ao decodificar JSON: {str(e)}"
-
-def editar_ticket(ticketId, sender_name):
-    # URL para buscar detalhes dos agentes
-    requests_cache.install_cache('api_cache', expire_after=600)
-
-    agents_url = "https://vittel.bolddesk.com/api/v1/agents"
-    headers = {
-        "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=",
-        "Content-Type": "application/json"
-    }
-    
-    # Fazendo a requisição para obter a lista de agentes
-    response = requests.get(agents_url, headers=headers)
-    if response.status_code != 200:
-        return f"Falha ao buscar o agente: {response.status_code}"
-    
-    agents_response = response.json()
-    if not isinstance(agents_response, dict) or 'result' not in agents_response:
-        return "Formato de resposta inesperado da API."
-    
-    agents = agents_response['result']
-    if not isinstance(agents, list):
-        return "Formato de resposta inesperado da API."
-    
-    # Filtrar o agente pelo nome
-    agent_info = next((agent for agent in agents if agent['name'] == sender_name), None)
-    if not agent_info:
-        return "Agente não encontrado."
-    
-    # Preparar os dados para atualizar o ticket
-    url = f"https://vittel.bolddesk.com/api/v1/tickets/{ticketId}/update_fields"
-    payload = {
-        "fields": {
-            "agentid": agent_info['userId'],
-
-            },
-            "notes": "Agente atualizado via API."
-        }
-
-  
-    
-    # Fazendo a requisição para atualizar o ticket
-    response = requests.put(url, headers=headers, json=payload)
-    print("4editar_ticket", response.json())
-    
-    if response.status_code == 200:
-        return "Ticket atualizado com sucesso."
+            return jsonify({"error": f"Erro ao decodificar JSON: {str(e)}"}), 400
     else:
-        return f"Falha ao atualizar o ticket: {response.status_code}"
+        return jsonify({"error": f"Falha na solicitação: {response.status_code}"}), response.status_code
+def editar_ticket(ticketId, sender_name):
+    try:
+    # URL para buscar detalhes dos agentes
+        requests_cache.install_cache('api_cache', expire_after=600)
+
+        agents_url = "https://vittel.bolddesk.com/api/v1/agents"
+        headers = {
+            "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=",
+            "Content-Type": "application/json"
+        }
+        
+        # Fazendo a requisição para obter a lista de agentes
+        response = requests.get(agents_url, headers=headers)
+        if response.status_code != 200:
+            return f"Falha ao buscar o agente: {response.status_code}"
+        
+        agents_response = response.json()
+        if not isinstance(agents_response, dict) or 'result' not in agents_response:
+            return "Formato de resposta inesperado da API."
+        
+        agents = agents_response['result']
+        if not isinstance(agents, list):
+            return "Formato de resposta inesperado da API."
+        
+        # Filtrar o agente pelo nome
+        agent_info = next((agent for agent in agents if agent['name'] == sender_name), None)
+        if not agent_info:
+            return "Agente não encontrado."
+        
+        # Preparar os dados para atualizar o ticket
+        url = f"https://vittel.bolddesk.com/api/v1/tickets/{ticketId}/update_fields"
+        payload = {
+            "fields": {
+                "agentid": agent_info['userId'],
+
+                },
+                "notes": "Agente atualizado via API."
+            }
+
+    
+        
+        # Fazendo a requisição para atualizar o ticket
+        response = requests.put(url, headers=headers, json=payload)
+        print("4editar_ticket", response.json())
+        
+        if response.status_code == 200:
+            return "Ticket atualizado com sucesso."
+        else:
+            return f"Falha ao atualizar o ticket: {response.status_code}"
+    except requests.RequestException as e:
+        return jsonify({"error": f"Erro na requisição: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Erro inesperado: {str(e)}"}), 500
 # def editar_ticket(ticketId, sender_name):
 #     # URL para buscar detalhes dos agentes
 #     agents_url = "https://vittel.bolddesk.com/api/v1/agents"
