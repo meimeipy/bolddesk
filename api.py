@@ -216,7 +216,6 @@ def atualizar_dados(dados_bold_desk, cliente_fornecedor):
         "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
     }   
     novos_dados = cliente_fornecedor.get('event', {}).get('body', {}).get('event', {})
-    print("3", novos_dados)
     campos_alterados = {}
     
     if 'nome_fantasia' in novos_dados and 'contactDisplayName' in dados_bold_desk and novos_dados['nome_fantasia'] != dados_bold_desk['contactDisplayName']:
@@ -384,7 +383,6 @@ def buscacliente(dadoss):
                     break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
-                    print("3", dados_bold_desk)
 
                     for contact in dados_bold_desk:
                         if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == format_cnpj_cpf(dadoss['cnpj_cpf']):
@@ -643,7 +641,6 @@ def get_sender_name(conversationId, ticketId):
     headers = {
         "api_access_token": "8BNDLDVBN8nw4AmArzsHghZx"
     }
-    time.sleep(20)
     response = requests.get(url, headers=headers)
     print("1get_sender_name", response.json())
     if response.status_code == 200:
@@ -890,7 +887,7 @@ def agenteachado(dados, user_id):
     }
 
     response = requests.get(url_agente, headers=headers, params=params)
-    print("22", response.text)
+    
 
     if response.status_code == 200:
         # Assuming the response is a JSON object with a 'result' field containing a list
@@ -955,7 +952,6 @@ def agenteachado(dados, user_id):
                     "tag": tag,
                     "titulo": titulo
                 })
-            print("33", all_tickets)
             if all_tickets:
                 return jsonify(all_tickets)
             else:
