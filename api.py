@@ -869,7 +869,7 @@ def encontrarcliente(dados):
         except requests.exceptions.RequestException as e:
             return f"Falha na solicitação: {str(e)}"
 
-    return f"Falha ao obter tickets: {response_tickets.status_code}"
+        return f"Falha ao obter tickets: {response_tickets.status_code}"
 
 def agenteachado(dados, user_id): 
     url_agente = f"https://vittel.bolddesk.com/api/v1/tickets/"
