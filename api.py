@@ -646,6 +646,7 @@ def get_sender_name(conversationId, ticketId):
     headers = {
         "api_access_token": "8BNDLDVBN8nw4AmArzsHghZx"
     }
+    time.sleep(20)
     response = requests.get(url, headers=headers)
     print("1get_sender_name", response.json())
     if response.status_code == 200:
