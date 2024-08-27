@@ -767,7 +767,7 @@ def acharocliente(dadoss):
     if response_tickets.status_code == 200:
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         params = {
-            "PerPage": 40,
+            "PerPage": 100,
             "Page": 1,
         }
         try:
