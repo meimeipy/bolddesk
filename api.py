@@ -438,7 +438,6 @@ def acharocliente(dadoss):
     }
 
     response_tickets = requests.get(url, headers=headers)
-    print("1", response_tickets)
 
     if response_tickets.status_code == 200:
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
@@ -449,13 +448,11 @@ def acharocliente(dadoss):
         try:
             while True:
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
-                print("2", response_contatos.text)
                 response_contatos.raise_for_status()
                 if params["Page"] >= 21:
                     break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
-                    print("3", dados_bold_desk)
 
                     for contact in dados_bold_desk:
                         if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dadoss['cnpj_cpf']):
@@ -527,7 +524,7 @@ def acharoccliente(dadoss):
             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
         }
         params = {
-            "PerPage": 40,
+            "PerPage": 100,
             "Page": 1,
         }
         try:
@@ -670,7 +667,6 @@ def editar_ticket(ticketId, sender_name):
     
     # Fazendo a requisição para obter a lista de agentes
     response = requests.get(agents_url, headers=headers)
-    print("2editar_ticket", response.json())
     if response.status_code != 200:
         return f"Falha ao buscar o agente: {response.status_code}"
     
@@ -684,7 +680,6 @@ def editar_ticket(ticketId, sender_name):
     
     # Filtrar o agente pelo nome
     agent_info = next((agent for agent in agents if agent['name'] == sender_name), None)
-    print("3editar_ticket", agent_info)
     if not agent_info:
         return "Agente não encontrado."
     
