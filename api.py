@@ -356,22 +356,21 @@ def webhook_delete():
 
 #########################################################################################################
 # consulta cnpj
+import requests
+import requests_cache
+
 def formatt_cnpj_cpf(value):
     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
 def buscacliente(dadoss):
-    url = "https://vittel.bolddesk.com/api/v1.0/tickets"
-    headers = {
+        requests_cache.install_cache('api_cache', expire_after=600)
+
+        headers = {
         "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
-    }
-
-    response_tickets = requests.get(url, headers=headers)
-    print("1", response_tickets)
-
-    if response_tickets.status_code == 200:
+        }
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         params = {
-            "PerPage": 40,
+            "PerPage": 100,
             "Page": 1,
         }
         try:
@@ -405,7 +404,7 @@ def buscacliente(dadoss):
         except requests.exceptions.RequestException as e:
          return jsonify({"error": f"Falha na solicitação: {str(e)}"}), 500
 
-    return jsonify({"error": f"Falha ao obter tickets: {response_tickets.status_code}"}), 500
+        return jsonify({"error": f"Falha ao obter tickets: {response_tickets.status_code}"}), 500
 
 @app.route('/webhook/consultaclienteid', methods=['GET']) 
 def dados_rece():
@@ -430,17 +429,15 @@ def formatt_cnpj_cpf(value):
     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
 def acharocliente(dadoss):
-    url = "https://vittel.bolddesk.com/api/v1.0/tickets"
-    headers = {
+        requests_cache.install_cache('api_cache', expire_after=600)
+
+        headers = {
         "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
-    }
+        }
 
-    response_tickets = requests.get(url, headers=headers)
-
-    if response_tickets.status_code == 200:
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         params = {
-            "PerPage": 40,
+            "PerPage": 100,
             "Page": 1,
         }
         try:
@@ -517,6 +514,8 @@ def formatt_cnpj_cpf(value):
     else:
         return "Formato inválido"
 def acharoccliente(dadoss):
+        requests_cache.install_cache('api_cache', expire_after=600)
+
         url_contatos = "https://vittel.bolddesk.com/api/v1/contacts"
         headers = {
             "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
@@ -656,6 +655,8 @@ def get_sender_name(conversationId, ticketId):
 
 def editar_ticket(ticketId, sender_name):
     # URL para buscar detalhes dos agentes
+    requests_cache.install_cache('api_cache', expire_after=600)
+
     agents_url = "https://vittel.bolddesk.com/api/v1/agents"
     headers = {
         "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0=",
