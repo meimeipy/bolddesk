@@ -386,7 +386,9 @@ def buscacliente(dadoss):
                             if 'userId' in contact:
                                 user_id = contact['userId']
                                 print("123333", user_id)
-                                return "true"
+                                contact_name = contact['contactDisplayName']
+                                print("123333", contact_name)
+                                return "true", contact_name
                             else:
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
@@ -580,7 +582,7 @@ def Abrir_Ticket(user_id, dadoss):
     
     user_selection = dadoss.get('Categoria')
     category_id = category_ids[user_selection]
-    
+    cater = dadoss.get('Categoria')
     now = datetime.utcnow()
     dueDate = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
@@ -589,7 +591,7 @@ def Abrir_Ticket(user_id, dadoss):
     protocol = now.strftime("%Y%m%d%H%M%S")
 
     # Append the protocol to the subject
-    subject_with_protocol = f"{extracted_data['Assunto']} - {protocol}"
+    subject_with_protocol = f"{cater} - {protocol}"
     assunto = extracted_data['Assunto']
     ticket_data = {
         "brandId": 1,
@@ -597,11 +599,11 @@ def Abrir_Ticket(user_id, dadoss):
         "categoryId": category_id,  
         "isVisibleInCustomerPortal": True,
         "requesterId": user_id,  
-        "description": extracted_data['Descrição'],
+        "description": f"{extracted_data['Descrição']}, Protocolo: {protocol}",
         "agentId": None,
         "priorityId": 1,
         "dueDate": dueDate,
-        "ticketPortalValue": 0
+        "ticketPortalValue": 0,
     }
     
     url_ticket = "https://vittel.bolddesk.com/api/v1/tickets"
@@ -610,13 +612,20 @@ def Abrir_Ticket(user_id, dadoss):
     }
     
     response_ull = requests.post(url_ticket, headers=headers, json=ticket_data) 
+    
     print("to aqui", response_ull.json())
+    
     logging.debug(f"Response: {response_ull.text}")
+    
     if response_ull.status_code == 201:
         print(f"user_id: {user_id}")
+        
         logging.debug(f"user_id: {user_id}")
+        
         ticketId = response_ull.json().get("id")
+        
         response_data = {"protocol": protocol, "assunto": assunto, "user_id": user_id, "ticketId": ticketId, "status": "true", "code": 201}
+        
         print("Response data:", response_data)
         logging.debug(f"Response data: {response_data}")
         
@@ -711,7 +720,7 @@ def editar_ticket(ticketId, sender_name):
         print("4editar_ticket", response.json())
         
         if response.status_code == 200:
-            return "Ticket atualizado com sucesso."
+            return {"status": "true", "sender_name": sender_name}
         else:
             return f"Falha ao atualizar o ticket: {response.status_code}"
     except requests.RequestException as e:
