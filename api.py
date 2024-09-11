@@ -363,7 +363,7 @@ def formatt_cnpj_cpf(value):
 
 def buscacliente(dadoss):
         requests_cache.install_cache('api_cache', expire_after=600)
-
+        
         headers = {
         "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
         }
@@ -389,7 +389,7 @@ def buscacliente(dadoss):
                                 print("123333", user_id)
                                 contact_name = contact['contactDisplayName']
                                 print("123333", contact_name)
-                                return contact_name, user_id
+                                return jsonify({"user_id": user_id, "contact_name": contact_name})
                             else:
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
