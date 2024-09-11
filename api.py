@@ -377,7 +377,7 @@ def buscacliente(dadoss):
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
                 
                 response_contatos.raise_for_status()
-                if params["Page"] >=60:
+                if params["Page"] >=30:
                     break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
@@ -394,7 +394,6 @@ def buscacliente(dadoss):
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
                     # Fix the typo and adjust the indentation
-                    time.sleep(1.5)
                     params["Page"] += 1
                 else:
                     # Move this break outside the loop to continue checking pages
