@@ -362,6 +362,7 @@ def formatt_cnpj_cpf(value):
     return f"{value[:2]}.{value[2:5]}.{value[5:8]}/{value[8:12]}-{value[12:]}"
 
 def buscacliente(dadoss):
+        requests_cache.install_cache('api_cache', expire_after=600)
 
         headers = {
         "x-api-key": "1Ed7TGUUE0rzqjP5WCbsRZh56qtWP8eHHKXD9aK/+X0="
@@ -393,6 +394,7 @@ def buscacliente(dadoss):
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
                     # Fix the typo and adjust the indentation
+                    time.sleep(1.5)
                     params["Page"] += 1
                 else:
                     # Move this break outside the loop to continue checking pages
