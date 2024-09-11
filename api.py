@@ -389,7 +389,7 @@ def buscacliente(dadoss):
                                 print("123333", user_id)
                                 contact_name = contact['contactDisplayName']
                                 print("123333", contact_name)
-                                return contact_name
+                                return contact_name, user_id
                             else:
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
@@ -978,9 +978,8 @@ def dados_recebidos2():
         return jsonify({"message": "Token inválido"}), 401
     dados = request.args  
     print("12", dados)
-    
-    if 'cnpj_cpf' in dados and dados['cnpj_cpf']:
-        return encontrarcliente(dados)
+    if 'cnpj_cpf' in dados and dados['cnpj_cpf'] and 'user_id' in dados and dados['user_id']:
+        return agenteachado(dados, dados['user_id'])
     else:
         return jsonify({"message": "Os parâmetros são necessários"}), 400
     
