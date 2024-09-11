@@ -877,7 +877,7 @@ def encontrarcliente(dados):
                     
 
                     for contact in dados_bold_desk:
-                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == format_cnpj_cpf(dados['cnpj_cpf']):
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dados['cnpj_cpf']):
                             if 'userId' in contact:
                                 user_id = contact['userId']
                                 print("123333", user_id)
