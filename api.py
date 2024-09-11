@@ -565,6 +565,7 @@ def Abrir_Ticket(user_id, dadoss):
     user_id = user_id
     extracted_data = {key: dadoss.get(key) for key in ["Assunto", "Categoria", "Descrição"]}
     print("123", extracted_data)
+    logging.debug(f"Extracted data: {extracted_data}")
     category_ids = {
         "VOZ IP": 11,
         "PABX IP": 12,
@@ -576,6 +577,7 @@ def Abrir_Ticket(user_id, dadoss):
     }
     
     user_selection = dadoss.get('Categoria')
+    logging.debug(f"User selection: {user_selection}")
     category_id = category_ids[user_selection]
     cater = dadoss.get('Categoria')
     now = datetime.utcnow()
