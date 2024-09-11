@@ -717,9 +717,9 @@ def editar_ticket(ticketId, sender_name):
         print("4editar_ticket", response.json())
         
         if response.status_code == 200:
-            return {"status": "true", "sender_name": sender_name}
+            return sender_name
         else:
-            return f"Falha ao atualizar o ticket: {response.status_code}"
+            return "false"
     except requests.RequestException as e:
         return jsonify({"error": f"Erro na requisição: {str(e)}"}), 500
     except Exception as e:
