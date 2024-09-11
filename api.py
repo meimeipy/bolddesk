@@ -389,7 +389,7 @@ def buscacliente(dadoss):
                                 print("123333", user_id)
                                 contact_name = contact['contactDisplayName']
                                 print("123333", contact_name)
-                                return f"true, {contact_name}"
+                                return contact_name
                             else:
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
