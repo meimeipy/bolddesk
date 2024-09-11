@@ -375,20 +375,21 @@ def buscacliente(dadoss):
         try:
             while True:
                 response_contatos = requests.get(url_contatos, headers=headers, params=params)
+                
                 response_contatos.raise_for_status()
-                if params["Page"] >=21:
+                if params["Page"] >=60:
                     break
                 if response_contatos.status_code == 200:
                     dados_bold_desk = response_contatos.json().get("result", [])
 
                     for contact in dados_bold_desk:
-                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == format_cnpj_cpf(dadoss['cnpj_cpf']):
+                        if 'contactExternalReferenceId' in contact and contact['contactExternalReferenceId'] == formatt_cnpj_cpf(dadoss['cnpj_cpf']):
                             if 'userId' in contact:
                                 user_id = contact['userId']
                                 print("123333", user_id)
                                 contact_name = contact['contactDisplayName']
                                 print("123333", contact_name)
-                                return "true", contact_name
+                                return f"true, {contact_name}"
                             else:
                                 return f"Contact encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}, mas 'userId' não está presente."
 
@@ -399,7 +400,7 @@ def buscacliente(dadoss):
                     break
 
             # This return statement will only be reached if the loop completes without finding the contact
-            return f"Nenhum contato encontrado para contactExternalReferenceId {dadoss['cnpj_cpf']}"
+            return "false"
 
         except requests.exceptions.RequestException as e:
          return jsonify({"error": f"Falha na solicitação: {str(e)}"}), 500
