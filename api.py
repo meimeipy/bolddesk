@@ -909,7 +909,7 @@ def agenteachado(dados, user_id):
     }
 
     response = requests.get(url_agente, headers=headers, params=params)
-    
+    print("1", response.json())
 
     if response.status_code == 200:
         # Assuming the response is a JSON object with a 'result' field containing a list
