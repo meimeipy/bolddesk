@@ -596,7 +596,7 @@ def Abrir_Ticket(user_id, dadoss):
         "categoryId": category_id,  
         "isVisibleInCustomerPortal": True,
         "requesterId": user_id,  
-        "description": f"{extracted_data['Descrição']}, Protocolo: {protocol}",
+        "description": f"{extracted_data['Descrição']}, Protocolo: {protocol}, Requisitante:{dadoss.get('NAME')}{dadoss.get('phoneNumber')}",
         "agentId": None,
         "priorityId": 1,
         "dueDate": dueDate,
@@ -674,6 +674,7 @@ def get_sender_name(conversationId, ticketId):
 def editar_ticket(ticketId, sender_name):
     try:
     # URL para buscar detalhes dos agentes
+        sender_name = sender_name
         requests_cache.install_cache('api_cache', expire_after=600)
 
         agents_url = "https://vittel.bolddesk.com/api/v1/agents"
@@ -933,6 +934,7 @@ def agenteachado(dados, user_id):
             # Extracting the required fields
             if ticket_info.get("category", {}).get("id") == category_id:
                 agente = ticket_info.get("agent", {})
+                print("2", agente)
                 marca = ticket_info.get("brand")
                 categoria = ticket_info.get("category", {})
                 criadoEm = ticket_info.get("createdOn")
