@@ -571,7 +571,7 @@ def Abrir_Ticket(user_id, dadoss):
         "PABX IP": 12,
         "Call Center": 16,
         "Sip Trunk": 17,
-        "Whatsapp/Chat": 18,
+        "WhatsApp/Chat": 18,
         "Cloud Server": 22,
         "SMS": 23
     }
@@ -920,7 +920,7 @@ def agenteachado(dados, user_id):
                 "PABX IP": 12,
                 "Call Center": 16,
                 "Sip Trunk": 17,
-                "Whatsapp/Chat": 18,
+                "WhatsApp/Chat": 18,
                 "Cloud Server": 22,
                 "SMS": 23
         }
