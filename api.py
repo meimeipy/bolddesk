@@ -596,7 +596,7 @@ def Abrir_Ticket(user_id, dadoss):
         "categoryId": category_id,  
         "isVisibleInCustomerPortal": True,
         "requesterId": user_id,  
-        "description": f"{extracted_data['Descrição']}, Protocolo: {protocol}, Requisitante:{dadoss.get('NAME')}{dadoss.get('phoneNumber')}",
+        "description": f"{extracted_data['Descrição']}, Protocolo: {protocol}, Requisitante: {dadoss.get('NAME')} ({dadoss.get('phoneNumber')})",
         "agentId": None,
         "priorityId": 1,
         "dueDate": dueDate,
